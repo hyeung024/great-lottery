@@ -1,0 +1,2021 @@
+<title>The Great Lottery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --felt:#1f3b35; --felt-deep:#162c27; --felt-line:#2f544a; --felt-hi:#28493f;
+  --paper:#eee6d3; --paper-edge:#d6c9a9; --ink:#2b2520; --ink-soft:#6b5f52;
+  --text:#ece6d6; --text-dim:#a8b8ae;
+  --wheat:#dca845; --wheat-soft:#dca84533; --madder:#c2553b; --indigo:#7fa3cf; --sage:#8fc29a;
+  --up:#8fd19e; --down:#f08c70; --up-bg:#8fd19e1f; --down-bg:#f08c701f;
+  --display:"IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --serif:"IM Fell English", "Iowan Old Style", Georgia, serif;
+  --ui:"Libre Franklin", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0; color:var(--text); font-family:var(--ui); font-size:15px; line-height:1.5;
+  background:var(--felt);
+  background-image:radial-gradient(ellipse at 50% -10%, #2c5247 0%, transparent 60%),
+                   radial-gradient(ellipse at 50% 120%, #10231f 0%, transparent 55%);
+  background-attachment:fixed;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--wheat);outline-offset:2px}
+table{color:inherit;font-size:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.01em}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+b.up,.up-t{color:var(--up)} b.down,.down-t{color:var(--down)} b.neutral{color:inherit}
+.btn{border:1px solid var(--wheat);background:var(--wheat);color:#241c10;font-weight:700;border-radius:999px;padding:10px 22px;font-size:14px;transition:transform .15s, filter .15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;color:var(--wheat)}
+.btn.small{padding:6px 14px;font-size:13px}
+.link{background:none;border:0;color:var(--wheat);text-decoration:underline;text-underline-offset:3px;padding:0}
+input[type=text]{background:var(--felt-deep);border:1px solid var(--felt-line);color:var(--text);border-radius:8px;padding:9px 12px;font:inherit;width:100%}
+
+/* paper surfaces flip the semantic colours to dark-on-light */
+.card,.sheet,.quiz,#pop{--up:#2d7a3e;--down:#b0392a;--up-bg:#2d7a3e1c;--down-bg:#b0392a18}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.wordmark{font-family:var(--display);font-size:22px;color:var(--wheat);background:none;border:0;padding:0}
+.topbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{border:1px solid var(--felt-line);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--text-dim);background:var(--felt-deep)}
+.chip b{color:var(--text);font-weight:600}
+.toggle{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--felt-line);border-radius:999px;padding:5px 12px 5px 6px;background:var(--felt-deep);font-size:12.5px;color:var(--text)}
+.toggle .sw{width:30px;height:18px;border-radius:9px;background:var(--felt-line);position:relative;transition:background .2s}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--text-dim);transition:transform .2s, background .2s}
+.toggle[aria-pressed="true"] .sw{background:var(--wheat)}
+.toggle[aria-pressed="true"] .sw::after{transform:translateX(12px);background:#241c10}
+
+/* ---------- hint bulbs ---------- */
+.bulb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--wheat);background:var(--wheat-soft);color:var(--wheat);padding:0;vertical-align:middle;margin-left:6px;flex:none;transition:transform .15s}
+.bulb:hover{transform:scale(1.12)}
+.bulb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sheet .bulb,.quiz .bulb{border-color:#8a5a14;color:#8a5a14;background:#dca84540}
+#pop{position:fixed;z-index:60;max-width:300px;background:var(--paper);color:var(--ink);border-radius:10px;padding:12px 14px;box-shadow:0 14px 30px #000a;font-size:13.5px;line-height:1.45;border:1px solid var(--paper-edge);animation:rise .18s ease}
+#pop h4{margin:0 0 4px;font-family:var(--display);font-size:17px;font-weight:400}
+#pop .x{position:absolute;top:6px;right:8px;background:none;border:0;color:var(--ink-soft);font-size:16px}
+
+/* ---------- home ---------- */
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;padding-block:30px 10px}
+.hero h1{font-size:clamp(44px,7vw,84px);line-height:.95;color:var(--paper)}
+.hero h1 em{font-family:var(--serif);font-style:italic;color:var(--wheat);display:block;font-size:.5em;margin-top:10px}
+.hero p.lede{font-size:17px;max-width:56ch;color:var(--text)}
+.hero .quote{font-family:var(--serif);font-style:italic;font-size:19px;color:var(--text-dim);border-left:2px solid var(--wheat);padding-left:14px;max-width:48ch}
+.hero .quote span{display:block;font-family:var(--ui);font-style:normal;font-size:12px;margin-top:4px;letter-spacing:.06em}
+.fan{position:relative;height:330px}
+.fan .card{position:absolute;left:50%;top:10px;transform-origin:50% 120%;pointer-events:none}
+.learn{margin-top:28px;background:var(--paper);color:var(--ink);border-radius:14px;padding:22px 24px;display:grid;grid-template-columns:220px 1fr;gap:24px}
+.learn h2{font-size:28px;line-height:1.05}
+.learn h2 small{display:block;font-family:var(--ui);font-size:13px;color:var(--ink-soft);margin-top:8px;line-height:1.45}
+.learn ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 22px;counter-reset:l}
+.learn li{counter-increment:l;display:grid;grid-template-columns:28px 1fr;gap:4px;font-size:14px}
+.learn li::before{content:counter(l);font-family:var(--display);font-size:22px;color:#8a5a14;line-height:1}
+.learn li b{display:block;font-size:14.5px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:22px}
+.mode{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.mode h3{font-size:24px;color:var(--paper)}
+.mode p{margin:0;color:var(--text-dim)}
+.mode .btn{align-self:flex-start;margin-top:auto}
+
+/* ---------- home v2: the game first ---------- */
+.hero2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:center;padding-block:34px 18px;min-height:min(560px,calc(100vh - 110px))}
+.hero2 h1{font-size:clamp(46px,7.2vw,88px);line-height:.93;color:var(--paper)}
+.hero2 h1 em{font-family:var(--serif);font-style:italic;color:var(--wheat);display:block;font-size:.46em;margin-top:12px}
+.hero2 .lede{font-size:17.5px;max-width:52ch;margin:0 0 22px}
+.namequote{margin:20px 0 18px;padding:2px 0 2px 16px;border-left:3px solid var(--wheat);max-width:50ch}
+.namequote p{margin:0;font-family:var(--serif);font-style:italic;font-size:21px;line-height:1.35;color:var(--paper)}
+.namequote footer{margin-top:6px;font-size:12px;color:var(--text-dim);letter-spacing:.02em}
+.play{display:flex;gap:12px;flex-wrap:wrap}
+.bigplay{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border-radius:14px;padding:15px 24px 14px;border:1.5px solid var(--wheat);background:transparent;color:var(--wheat);text-align:left;transition:transform .15s, filter .15s, box-shadow .15s;min-width:220px}
+.bigplay .t{font-family:var(--display);font-size:24px;line-height:1.1}
+.bigplay .s{font-size:12.5px;opacity:.85;font-weight:500}
+.bigplay.primary{background:var(--wheat);color:#241c10;box-shadow:0 10px 26px #dca84540}
+.bigplay:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.07)}
+.bigplay:disabled{opacity:.45;cursor:not-allowed}
+.resume{display:flex;align-items:center;gap:10px;margin-top:14px;background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:999px;padding:8px 16px;font-size:13.5px;color:var(--text);max-width:100%;text-align:left}
+.resume:hover{border-color:var(--wheat)}
+.resume .dot{width:8px;height:8px;border-radius:50%;background:var(--up);box-shadow:0 0 0 4px #8fd19e33;flex:none}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px;font-size:13px;color:var(--text-dim)}
+.facts b{font-family:var(--mono);color:var(--paper);font-weight:500;font-size:15px;margin-right:3px}
+.fan.table{height:400px}
+.fan.table::before{content:"";position:absolute;left:50%;top:58%;width:min(520px,100%);height:220px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,#dca84522,transparent 70%)}
+.fan.table > .card,.fan.table > .fanwrap{position:absolute;left:50%;top:20px;transform-origin:50% 130%;transition:transform .35s cubic-bezier(.2,.8,.3,1)}
+.fan.table > .fanwrap > .card{--w:158px;position:relative;left:auto;top:auto;transform:none}
+.fan.table:hover > .card,.fan.table:hover > .fanwrap{transform:translateX(calc(-50% + (var(--i) - 1.5) * 34px)) rotate(calc(var(--a) * 1.35)) translateY(calc(var(--y) - 10px))!important}
+.season-strip{border-top:1px solid var(--felt-line);border-bottom:1px solid var(--felt-line);padding-block:20px;margin-top:10px}
+.season-strip ol{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;counter-reset:st}
+.season-strip li{counter-increment:st;display:grid;grid-template-columns:34px 1fr;gap:2px 10px;position:relative}
+.season-strip li::before{content:counter(st);grid-row:span 2;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--wheat);color:var(--wheat);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:17px}
+.season-strip b{color:var(--paper);font-family:var(--display);font-weight:400;font-size:19px;line-height:1.2}
+.season-strip span{font-size:13px;color:var(--text-dim);line-height:1.45}
+.study{margin-top:34px}
+.study-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.study-head h2{font-size:26px;color:var(--paper)}
+.study-head p{margin:0;color:var(--text-dim);font-size:14px}
+.study-grid{display:grid;grid-template-columns:1.2fr repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.tile{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:16px 18px;text-align:left;color:var(--text)}
+.tile h3{font-size:20px;color:var(--paper)}
+.tile p{margin:4px 0 0;font-size:13px;color:var(--text-dim)}
+.learn-tile ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--text-dim);line-height:1.6}
+.link-tile{display:flex;flex-direction:column;align-items:flex-start;transition:border-color .15s, transform .15s}
+.link-tile:hover{border-color:var(--wheat);transform:translateY(-2px)}
+.link-tile .ti svg{width:30px;height:30px;stroke:var(--wheat);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:6px}
+.link-tile .go{margin-top:auto;padding-top:10px;color:var(--wheat);font-weight:700;font-size:13px}
+.quote.small{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--text-dim);border-left:2px solid var(--wheat);padding-left:14px;margin-top:26px;max-width:60ch}
+.quote.small span{display:block;font-family:var(--ui);font-style:normal;font-size:11.5px;letter-spacing:.06em;margin-top:4px}
+@media (max-width:980px){
+  .hero2{grid-template-columns:1fr;min-height:0;padding-top:18px}
+  .fan.table{height:320px}
+  .season-strip ol{grid-template-columns:1fr 1fr}
+  .study-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .fan.table{height:260px}
+  .fan.table > .card,.fan.table > .fanwrap > .card{--w:128px;min-height:0}
+  .fan.table .qt{display:none}
+  .season-strip ol,.study-grid{grid-template-columns:1fr}
+  .bigplay{min-width:0;flex:1 1 100%}
+}
+
+/* ---------- cards ---------- */
+.card{
+  --w:158px; width:var(--w); min-height:236px; background:var(--paper);
+  background-image:linear-gradient(160deg,#f6f0e0 0%,var(--paper) 45%,#e4d9bf 100%);
+  color:var(--ink); border-radius:11px; border:1px solid var(--paper-edge);
+  box-shadow:0 1px 0 #fff8 inset, 0 8px 18px #0006, 0 2px 4px #0005;
+  padding:10px 11px; display:flex; flex-direction:column; gap:6px; text-align:left;
+  transition:transform .18s ease, box-shadow .18s ease, outline-color .18s; position:relative;
+  outline:3px solid transparent; outline-offset:2px;
+}
+button.card:hover{transform:translateY(-6px)}
+.card.sel{transform:translateY(-12px);outline-color:var(--wheat);box-shadow:0 18px 28px #0008}
+.card.dim{opacity:.5}
+.card .kind{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;display:flex;justify-content:space-between}
+.card .ttl{font-family:var(--display);font-size:18px;line-height:1.05;min-height:38px}
+.card .ico{height:52px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#2b25200d;border:1px solid #2b252014}
+.card .ico svg{width:42px;height:42px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.card .fx{font-size:12px;line-height:1.38;font-weight:500}
+.card .fx b{font-weight:700}
+.card .qt{font-family:var(--serif);font-style:italic;font-size:11.5px;line-height:1.3;color:var(--ink-soft);margin-top:auto;border-top:1px solid #2b25201f;padding-top:6px}
+.card.locked{filter:grayscale(1);opacity:.45;cursor:not-allowed;box-shadow:0 2px 6px #0004}
+button.card.locked:hover{transform:none}
+.card .lockmsg{position:absolute;left:8px;right:8px;top:44%;background:var(--ink);color:var(--paper);font-size:11px;font-weight:700;text-align:center;border-radius:6px;padding:5px 6px;letter-spacing:.02em}
+.chips{display:flex;flex-direction:column;gap:4px}
+.cx{font-size:11px;font-weight:600;line-height:1.25;padding:3px 7px;border-radius:6px;display:grid;grid-template-columns:10px 1fr;gap:4px;align-items:start}
+.cx::before{font-size:9px;line-height:14px}
+.cx.up{background:var(--up-bg);color:var(--up)} .cx.up::before{content:"▲"}
+.cx.down{background:var(--down-bg);color:var(--down)} .cx.down::before{content:"▼"}
+.cx.neutral{background:#2b25200f;color:var(--ink-soft)} .cx.neutral::before{content:"●"}
+.card .pv{margin-top:auto;border-top:1px dashed #2b252040;padding-top:6px;font-size:11px;color:var(--ink-soft)}
+.card .pv b{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:500}
+.card.family .kind span:last-child{color:#8a5a14}
+.card.action .kind span:last-child{color:#2f5a86}
+.card.event{--w:200px;min-height:0;background-image:linear-gradient(160deg,#f3ead6,#e2d4b4)}
+.card.event .ttl{font-size:22px;min-height:0}
+.card.event .fx{font-size:12.5px;font-weight:500;line-height:1.35}
+.card.event .qt{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--ink-soft)}
+.card.back{min-height:0;aspect-ratio:5/7;background:repeating-linear-gradient(45deg,#8e2f22 0 6px,#a23a2a 6px 12px);border-color:#5b1d15}
+.card.back::after{content:"";position:absolute;inset:8px;border:1px solid #f0d9b588;border-radius:7px}
+
+/* ---------- game layout ---------- */
+.board{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px}
+.panel{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:18px}
+.panel h2{font-size:22px;color:var(--paper)}
+.panel .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.yearline{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.year{font-family:var(--display);font-size:56px;line-height:1;color:var(--paper)}
+.pips{display:flex;gap:4px;flex-wrap:wrap;max-width:320px}
+.pip{width:20px;height:6px;border-radius:3px;background:var(--felt-line)}
+.pip.done{background:var(--wheat)}
+.pip.now{background:var(--paper)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-block:14px}
+.stat{border-top:2px solid var(--felt-line);padding-top:8px}
+.stat .v{font-family:var(--mono);font-size:26px;color:var(--paper);line-height:1.1}
+.stat .s{font-size:12px;color:var(--text-dim);display:flex;align-items:center}
+.stat.pop{border-color:var(--madder)} .stat.food{border-color:var(--wheat)} .stat.wage{border-color:var(--indigo)}
+.stat .tag{font-size:11px;font-weight:600;letter-spacing:.04em}
+.tag.bad{color:var(--down)} .tag.good{color:var(--up)} .tag.meh{color:var(--wheat)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--text-dim);font-family:var(--ui);font-size:10px}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--text-dim);flex-wrap:wrap;margin-top:4px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.lbl{display:flex;align-items:center;gap:0}
+.event-now{display:flex;gap:16px;align-items:flex-start;margin-top:16px;padding-top:14px;border-top:1px dashed var(--felt-line)}
+.event-now .card{--w:150px;flex:none}
+.event-now .card .ttl{font-size:17px}
+.event-now p{margin:0 0 6px;color:var(--text-dim);font-size:14px}
+
+.houses{display:flex;flex-direction:column;gap:10px}
+.house{border:1px solid var(--felt-line);border-radius:12px;padding:12px 14px;background:var(--felt)}
+.house.me{border-color:var(--wheat)}
+.house .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.house .nm{font-family:var(--display);font-size:19px;color:var(--paper)}
+.house .st{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.st.ready{color:var(--up)} .st.wait{color:var(--text-dim)}
+.people{display:flex;flex-wrap:wrap;gap:3px;margin-block:8px;min-height:12px}
+.person{width:9px;height:12px;border-radius:5px 5px 2px 2px;background:var(--paper)}
+.person.lost{background:transparent;border:1px dashed var(--madder)}
+.person.gone{background:var(--indigo)}
+.person.new{background:var(--up)}
+.ledger{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:11px;color:var(--text-dim)}
+.ledger b{display:block;font-family:var(--mono);font-size:15px;color:var(--text);font-weight:500}
+.parson{font-size:11px;color:var(--text-dim);margin-top:6px;font-style:italic;font-family:var(--serif)}
+.key{margin:10px 2px 0;font-size:12.5px;line-height:1.7;color:var(--text-dim)}
+.key span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.key i.person{display:inline-block;flex:none;vertical-align:middle}
+.parish-npc{font-size:13px;color:var(--text-dim);border-top:1px dashed var(--felt-line);padding-top:10px;display:flex;align-items:center;flex-wrap:wrap}
+
+.hand{margin-top:22px}
+.hand .rowlabel{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.hand h2{font-size:24px;color:var(--paper)}
+.cards{display:flex;gap:14px;flex-wrap:wrap;padding-block:14px 6px}
+.handgrid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:start}
+.quiz{background:var(--paper);color:var(--ink);border-radius:12px;padding:16px 18px;max-width:560px;margin-top:14px}
+.quiz .eyebrow{color:var(--ink-soft)}
+.quiz .q{font-family:var(--serif);font-size:18px;line-height:1.3;margin:4px 0 10px}
+.quiz .opts{display:flex;flex-direction:column;gap:6px}
+.quiz .opt{border:1px solid #2b252033;background:#fff6;border-radius:8px;padding:7px 10px;text-align:left;font-size:13.5px;color:var(--ink)}
+.quiz .opt.sel{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.lockbar{position:sticky;bottom:0;margin-top:20px;background:linear-gradient(transparent,var(--felt-deep) 35%);padding-block:22px calc(14px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lockbar .sum{font-size:14px;color:var(--text-dim)}
+.lockbar .sum b{color:var(--text)}
+.waiting{padding:28px;text-align:center;border:1px dashed var(--felt-line);border-radius:14px;color:var(--text-dim)}
+.waiting h3{color:var(--paper);font-size:24px;margin-bottom:6px}
+
+/* ---------- overlays ---------- */
+.overlay{position:fixed;inset:0;background:#0b1512d9;z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:calc(24px + env(safe-area-inset-top,0px)) 16px 40px}
+.sheet{background:var(--paper);color:var(--ink);border-radius:14px;max-width:860px;width:100%;padding:26px;box-shadow:0 30px 60px #000a;animation:rise .35s ease}
+@keyframes rise{from{transform:translateY(16px);opacity:.3}to{transform:none;opacity:1}}
+.sheet h2{font-size:34px;line-height:1}
+.sheet h3{font-size:20px}
+.sheet .eyebrow{color:var(--ink-soft)}
+.sheet .toprow{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.sheet .toprow .card{flex:none}
+.sheet .col{flex:1;min-width:240px}
+.sheet table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;color:var(--ink)}
+.sheet th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-align:left;color:var(--ink-soft);border-bottom:1px solid #2b252040;padding:6px 6px}
+.sheet td{border-bottom:1px solid #2b25201a;padding:8px 6px;vertical-align:top;color:var(--ink)}
+.sheet td.n{font-family:var(--mono);text-align:right;white-space:nowrap;font-size:15px}
+.sheet td .ln{font-size:12.5px;line-height:1.45}
+.sheet .tblwrap{overflow-x:auto}
+.sec-h{display:flex;align-items:center;margin-top:18px}
+.voices{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.voice{border-radius:10px;padding:12px 14px;font-size:13.5px}
+.voice.m{background:#dca84526;border:1px solid #dca84566}
+.voice.h{background:#7fa3cf26;border:1px solid #7fa3cf66}
+.voice .who{font-family:var(--display);font-size:16px;margin-bottom:4px}
+.voice .say{font-family:var(--serif);font-size:15px;line-height:1.35}
+.insight{margin-top:14px;padding:12px 14px;border-left:3px solid var(--ink);background:#ffffff55;font-size:14px}
+.exam{margin-top:10px;border:1px solid #2b252030;border-radius:10px;overflow:hidden}
+.exam .row{display:grid;grid-template-columns:130px 1fr;border-bottom:1px solid #2b25201a}
+.exam .row:last-child{border-bottom:0}
+.exam .row > div{padding:9px 12px;font-size:14px}
+.exam .row > div:first-child{background:#ffffff66;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--ink-soft)}
+.exam .q{font-family:var(--serif);font-size:17px}
+.sheet .actions{display:flex;justify-content:flex-end;margin-top:18px;gap:10px;flex-wrap:wrap}
+.sheet .btn{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.sheet .btn.ghost{background:transparent;color:var(--ink)}
+.bigw{font-family:var(--mono);font-size:44px;line-height:1}
+.bigw small{font-size:14px;color:var(--ink-soft)}
+.curtain{text-align:center;padding-block:40px}
+.curtain .card.back{--w:120px;margin:0 auto 18px}
+.guide h3{font-size:22px;margin-top:18px}
+.guide p,.guide li{font-size:14.5px;line-height:1.55}
+.guide .map{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #2b252030;border-radius:10px;overflow:hidden;margin-top:8px}
+.guide .map div{padding:8px 12px;border-bottom:1px solid #2b25201f;font-size:13.5px}
+.guide .map div:nth-child(odd){background:#ffffff66;font-weight:600}
+
+/* tutorial */
+.tut .steps{display:flex;gap:6px;margin-bottom:14px}
+.tut .steps span{height:5px;flex:1;border-radius:3px;background:#2b252022}
+.tut .steps span.on{background:var(--ink)}
+.tut .body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:26px;align-items:center;min-height:300px}
+.tut .vis{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;background:#2b25200a;border-radius:12px;padding:18px;min-height:260px}
+.tut .vis .card{--w:150px}
+.tut p{font-size:15px;line-height:1.55;margin:8px 0}
+.tut ul{padding-left:18px;margin:8px 0;font-size:14.5px}
+.tut .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+.tut .foot .r{display:flex;gap:8px}
+.formula{font-family:var(--mono);font-size:22px;text-align:center;line-height:1.3}
+.formula small{display:block;font-family:var(--ui);font-size:12px;color:var(--ink-soft)}
+.gauge{width:100%;max-width:280px;height:16px;border-radius:8px;background:linear-gradient(90deg,#b0392a55,#b0392a22 45%,#2d7a3e22 55%,#2d7a3e55);position:relative;margin-top:14px}
+.gauge::after{content:"subsistence";position:absolute;left:50%;top:-4px;height:24px;border-left:2px dashed var(--ink);font-size:10px;padding-left:4px;padding-top:22px;color:var(--ink-soft)}
+.gauge i{position:absolute;top:-3px;width:6px;height:22px;background:var(--ink);border-radius:3px}
+.mini-people{display:flex;flex-wrap:wrap;gap:4px;max-width:220px;justify-content:center}
+.mini-people span{width:14px;height:19px;border-radius:7px 7px 3px 3px;background:var(--ink)}
+.mini-people span.gone{background:#7fa3cf}
+.mini-people span.lost{background:transparent;border:1.5px dashed #b0392a}
+
+/* setup + lobby */
+.lobby{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.roomlist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.roomrow{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--felt-line);border-radius:10px;padding:10px 14px;background:var(--felt)}
+.roomrow .code{font-family:var(--mono);font-size:18px;color:var(--wheat)}
+.namefield{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.namefield label{font-size:12px;color:var(--text-dim);font-weight:600}
+.setup-names{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block:14px}
+.notice{border:1px dashed var(--felt-line);border-radius:12px;padding:14px;color:var(--text-dim);font-size:14px}
+.stepper{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-block:6px 18px;padding:12px 14px;border:1px solid var(--felt-line);border-radius:12px;background:var(--felt)}
+.stepper .ctl{display:flex;align-items:center;border:1px solid var(--felt-line);border-radius:999px;overflow:hidden}
+.stepper .ctl button{background:var(--felt-deep);border:0;width:38px;height:36px;font-size:18px;color:var(--wheat)}
+.stepper .ctl button:disabled{color:var(--felt-line);cursor:not-allowed}
+.stepper .ctl output{min-width:44px;text-align:center;font-family:var(--mono);font-size:20px;color:var(--paper)}
+.stepper .desc{font-size:13px;color:var(--text-dim)}
+.stepper .desc b{color:var(--text)}
+.final-rank{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.rankrow{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;border-bottom:1px solid #2b25201f;padding-block:6px}
+.rankrow .pos{font-family:var(--display);font-size:24px}
+.rankrow .sc{font-family:var(--mono);font-size:22px}
+.rankrow .br{font-size:12px;color:var(--ink-soft)}
+.rankrow.winner{background:#dca84530;border-radius:10px;padding-inline:8px}
+.crown{color:#8a5a14;display:inline-block;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.finalcharts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px 22px;align-items:center;margin-top:10px}
+.finalcharts p{margin:0;font-size:14.5px;line-height:1.55}
+.chartbox{background:var(--felt-deep);border-radius:12px;padding:12px 14px;color:var(--text)}
+.chartbox .eyebrow{color:var(--text-dim)}
+.chartbox b.up{color:#8fd19e}
+
+/* big event card on the board */
+.event-now .card{--w:280px}
+.event-now .card .ttl{font-size:28px}
+.event-now .card .fx{font-size:15px;line-height:1.4}
+.event-now .card .qt{font-size:14px;line-height:1.35}
+.event-now .card .kind{font-size:10px}
+
+/* ---------- motion ---------- */
+.flip{animation:flipIn .7s cubic-bezier(.2,.7,.3,1) backwards;animation-delay:var(--d,0ms)}
+.flip::before{content:"";position:absolute;inset:-1px;border-radius:11px;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(45deg,#8e2f22 0 6px,#a23a2a 6px 12px);box-shadow:inset 0 0 0 6px #8e2f22, inset 0 0 0 7px #f0d9b588;
+  animation:backFade .7s both;animation-delay:var(--d,0ms)}
+@keyframes flipIn{0%{transform:perspective(900px) translateY(-28px) rotateY(180deg) scale(.9);opacity:0}15%{opacity:1}100%{transform:perspective(900px) rotateY(0) scale(1)}}
+@keyframes backFade{0%,49%{opacity:1}51%,100%{opacity:0}}
+.pop-in{animation:popIn .45s cubic-bezier(.2,1.4,.4,1) backwards;animation-delay:var(--d,0ms)}
+@keyframes popIn{from{transform:scale(.6);opacity:0}}
+.card.sel{animation:none}
+.card.sel::after{content:"";position:absolute;inset:-3px;border-radius:13px;box-shadow:0 0 18px 2px #dca84599;pointer-events:none;animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 6px 0 #dca84544}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.stamp{position:fixed;left:50%;top:40%;z-index:55;pointer-events:none;font-family:var(--display);font-size:54px;color:var(--wheat);border:4px solid var(--wheat);border-radius:12px;padding:4px 22px;background:#162c27e6;animation:stamp .9s ease forwards}
+@keyframes stamp{0%{transform:translate(-50%,-50%) scale(2.2) rotate(-14deg);opacity:0}25%{transform:translate(-50%,-50%) scale(1) rotate(-8deg);opacity:1}75%{opacity:1}100%{transform:translate(-50%,-50%) scale(1) rotate(-8deg);opacity:0}}
+@media (max-width:900px){.finalcharts{grid-template-columns:1fr}.event-now{flex-direction:column}.event-now .card{--w:100%}}
+
+/* turn screen */
+.turn-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.turn-head h2{font-size:34px;color:var(--paper);line-height:1}
+.turn-head .glance{font-size:13px;color:var(--text-dim);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.turn-head .glance b{font-family:var(--mono);color:var(--text);font-weight:500}
+.turn-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:start}
+.turn-side{display:flex;flex-direction:column;gap:14px}
+.turn-side .card.event{--w:100%}
+.turn-side .quiz{margin:0;max-width:none;padding:14px 16px}
+.turn-side .quiz .q{font-size:16px}
+.mystats{background:var(--felt-deep);border:1px solid var(--wheat);border-radius:12px;padding:12px 14px}
+.mystats .nm{font-family:var(--display);font-size:20px;color:var(--paper)}
+.turn-grid{grid-template-columns:270px auto 290px;justify-content:space-between}
+.turn-main .cards{padding-block:10px 4px;gap:16px;flex-wrap:nowrap}
+.turn-main .card{--w:172px;min-height:262px}
+.turn-main .card .ttl{font-size:19px}
+.turn-main .card .fx{font-size:12.5px}
+.turn-right{display:flex;flex-direction:column;gap:14px}
+.turn-right .quiz{margin:0;max-width:none;padding:14px 16px}
+.turn-right .quiz .q{font-size:16px}
+.choices{background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:12px;padding:14px 16px}
+.choices dl{margin:10px 0 14px;display:flex;flex-direction:column;gap:8px}
+.choices dl div{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:13.5px;border-bottom:1px dashed var(--felt-line);padding-bottom:7px}
+.choices dt{color:var(--text-dim)}
+.choices dd{margin:0;color:var(--paper);font-weight:600}
+.dim-t{color:var(--text-dim);font-weight:400}
+.lockbtn{width:100%;padding-block:12px;font-size:15px}
+@media (max-width:1180px){
+  .turn-grid{grid-template-columns:260px minmax(0,1fr)}
+  .turn-right{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start}
+  .turn-main .cards{flex-wrap:wrap}
+}
+@media (max-width:760px){ .turn-right{grid-template-columns:1fr} }
+.turn-lock{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px dashed var(--felt-line)}
+.turn-lock .sum{font-size:14px;color:var(--text-dim)}
+.turn-lock .sum b{color:var(--text)}
+.board-cta{margin-top:22px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 20px;border:1px solid var(--wheat);border-radius:14px;background:var(--felt-deep)}
+.board-cta h3{font-size:24px;color:var(--paper)}
+.board-cta p{margin:2px 0 0;color:var(--text-dim);font-size:14px}
+
+/* study notes */
+.notes{max-width:900px;margin:0 auto}
+.notes .sheet{max-width:none;animation:none}
+.notes h2{font-size:30px;margin-top:30px}
+.notes h2:first-of-type{margin-top:6px}
+.notes h3{font-size:19px;margin-top:18px}
+.notes p,.notes li{font-size:15px;line-height:1.6;max-width:72ch}
+.notes .callout{border-left:3px solid #8a5a14;background:#dca84522;padding:10px 14px;border-radius:0 8px 8px 0;font-size:14.5px}
+.notes .big{font-family:var(--serif);font-size:21px;line-height:1.4}
+.notes table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px;color:var(--ink)}
+.notes th,.notes td{border-bottom:1px solid #2b252022;padding:7px 8px;text-align:left;vertical-align:top;color:var(--ink)}
+.notes th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.notes td.n{font-family:var(--mono);text-align:right}
+.notes .tw{overflow-x:auto}
+.notes .flow{font-family:var(--mono);font-size:13.5px;background:#2b25200d;border-radius:10px;padding:14px 16px;line-height:1.9}
+.notes .flow b{font-family:var(--ui)}
+.notes-wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:start;max-width:1140px;margin:0 auto}
+.notes-wrap .notes{max-width:none;margin:0}
+.outline{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));background:var(--felt-deep);border:1px solid var(--felt-line);border-radius:14px;padding:14px 10px;max-height:calc(100vh - 32px);overflow-y:auto}
+.outline .eyebrow{padding-inline:10px;margin-bottom:8px}
+.outline nav{display:flex;flex-direction:column;gap:2px}
+.outline button.sec{background:none;border:0;border-left:2px solid transparent;text-align:left;padding:7px 10px;border-radius:0 8px 8px 0;font-size:13.5px;color:var(--text-dim);display:grid;grid-template-columns:22px 1fr;gap:4px;line-height:1.3}
+.outline button.sec span{font-family:var(--mono);font-size:11px;color:var(--wheat);padding-top:2px}
+.outline button.sec:hover{background:var(--felt-hi);color:var(--text)}
+.outline button.sec.on{border-left-color:var(--wheat);background:var(--felt-hi);color:var(--paper);font-weight:600}
+.outline .back{margin:12px 10px 2px;width:calc(100% - 20px)}
+.notes h2[id]{scroll-margin-top:20px}
+.notes h2 small{font-family:var(--ui);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-left:8px;white-space:nowrap}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:16px;justify-items:center;background:var(--felt);border-radius:12px;padding:18px;margin-top:12px}
+.cat-grid .card{--w:100%;max-width:190px}
+.cat-events{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:12px}
+.cat-ev{background:var(--felt);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.cat-ev .card.event{--w:100%}
+.cat-ev .meta .eyebrow{color:var(--text-dim);margin-bottom:6px}
+.cat-ev .voice{background:#7fa3cf33;color:var(--text);border-color:#7fa3cf55}
+.cat-quiz{padding-left:22px;display:flex;flex-direction:column;gap:14px;margin-top:12px}
+.cat-quiz > li{border-bottom:1px solid #2b25201f;padding-bottom:12px}
+.cat-quiz .q{font-family:var(--serif);font-size:18px;line-height:1.3}
+.cat-quiz .opts{list-style:none;padding:0;margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}
+.cat-quiz .opts li{font-size:13px;border:1px solid #2b252026;border-radius:8px;padding:4px 10px;background:#fff5;max-width:none}
+.cat-quiz .opts li.right{border-color:#2d7a3e66;background:#2d7a3e14}
+.cat-quiz .why{margin:4px 0;font-size:14px}
+.cat-qsec{margin-top:22px!important;padding-bottom:4px;border-bottom:2px solid #8a5a1455}
+.cat-qsec small{font-family:var(--ui);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-left:6px}
+
+/* examination hall */
+.extras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:30px}
+.extras .catalog-cta{margin-top:0;grid-template-columns:1fr;gap:18px;align-content:start}
+.mini-quiz{background:var(--paper);color:var(--ink);border-radius:12px;padding:12px 14px;max-width:320px;box-shadow:0 8px 18px #0006;transform:rotate(-2deg)}
+.mini-quiz .q{font-family:var(--serif);font-size:15px;margin:4px 0 8px}
+.mini-quiz span{display:block;font-size:12px;border:1px solid #2b252026;border-radius:6px;padding:4px 8px;margin-top:4px}
+.mini-quiz span.ok{border-color:#2d7a3e;background:#2d7a3e1a;color:#2d7a3e;font-weight:700}
+.hall{max-width:860px;margin:0 auto}
+.hall-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.hall-head h2{font-size:40px;color:var(--paper);line-height:1}
+.hall-head .score{font-family:var(--mono);font-size:15px;color:var(--text-dim)}
+.hall-head .score b{color:var(--up);font-size:22px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 12px}
+.filters button{border:1px solid var(--felt-line);background:var(--felt-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12.5px}
+.filters button.on{background:var(--wheat);border-color:var(--wheat);color:#241c10;font-weight:700}
+.filters button small{opacity:.75;margin-left:3px}
+.progress{height:8px;border-radius:4px;background:var(--felt-line);overflow:hidden;margin-bottom:6px}
+.progress i{display:block;height:100%;background:var(--wheat);transition:width .35s ease}
+.pmeta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-dim);margin-bottom:12px}
+.pcard{background:var(--paper);color:var(--ink);border-radius:16px;padding:26px 28px;box-shadow:0 20px 40px #0007}
+.pcard .qtext{font-family:var(--serif);font-size:26px;line-height:1.25;margin:8px 0 18px;text-wrap:balance}
+.pcard .eyebrow{color:var(--ink-soft)}
+.popts{display:flex;flex-direction:column;gap:10px}
+.popt{display:grid;grid-template-columns:34px 1fr 24px;gap:10px;align-items:center;text-align:left;border:1.5px solid #2b252030;background:#fff7;border-radius:12px;padding:12px 14px;font-size:15.5px;color:var(--ink);transition:transform .12s, border-color .15s, background .15s}
+.popt:hover:not(:disabled){transform:translateX(4px);border-color:var(--ink)}
+.popt .ltr{width:30px;height:30px;border-radius:50%;border:1.5px solid #2b252055;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px}
+.popt:disabled{cursor:default}
+.popt.right{border-color:#2d7a3e;background:#2d7a3e1f}
+.popt.right .ltr{background:#2d7a3e;color:#fff;border-color:#2d7a3e}
+.popt.wrong{border-color:#b0392a;background:#b0392a14}
+.popt.wrong .ltr{background:#b0392a;color:#fff;border-color:#b0392a}
+.popt.faded{opacity:.5}
+.popt .mk{font-weight:700;font-size:18px}
+.pexplain{margin-top:18px;border-radius:12px;padding:14px 16px;animation:rise .3s ease}
+.pexplain.ok{background:#2d7a3e14;border:1px solid #2d7a3e44}
+.pexplain.no{background:#b0392a10;border:1px solid #b0392a40}
+.pexplain h4{margin:0 0 6px;font-family:var(--display);font-size:22px;font-weight:400}
+.pexplain p{margin:6px 0 0;font-size:14.5px;line-height:1.55}
+.pfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.pfoot .kbd{font-size:12px;color:var(--ink-soft)}
+.pfoot .btn{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.presult .big{font-family:var(--mono);font-size:64px;line-height:1}
+.presult .bars{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.presult .bar{display:grid;grid-template-columns:170px 1fr 54px;gap:10px;align-items:center;font-size:13px}
+.presult .bar .t{height:10px;border-radius:5px;background:#2b252018;overflow:hidden}
+.presult .bar .t i{display:block;height:100%;background:#2d7a3e}
+.presult .missed{margin-top:18px;padding-left:20px}
+.presult .missed li{margin-bottom:10px;font-size:14px}
+@media (max-width:760px){.extras{grid-template-columns:1fr}.pcard{padding:18px}.pcard .qtext{font-size:21px}.presult .bar{grid-template-columns:110px 1fr 44px}}
+.catalog-cta{margin-top:30px;display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center;padding:24px 28px;border:1px solid var(--felt-line);border-radius:16px;background:var(--felt-deep)}
+.catalog-cta h3{font-size:30px;color:var(--paper);margin:4px 0 6px}
+.catalog-cta p{color:var(--text-dim);margin:0 0 14px;max-width:60ch}
+.mini-fan{display:flex;padding-inline:10px}
+.mini-fan > div{margin-left:-46px}
+.mini-fan > div:first-child{margin-left:0}
+.mini-fan .card{--w:132px;min-height:0;pointer-events:none}
+.mini-fan .card .qt,.mini-fan .card .fx{display:none}
+@media (max-width:760px){.catalog-cta{grid-template-columns:1fr}.mini-fan{justify-content:center}}
+@media (max-width:900px){
+  .notes-wrap{grid-template-columns:1fr}
+  .outline{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;max-height:none;padding:8px;border-radius:12px}
+  .outline .eyebrow,.outline .back{display:none}
+  .outline nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .outline button.sec{flex:none;border-left:0;border-bottom:2px solid transparent;border-radius:8px;white-space:nowrap}
+  .outline button.sec.on{border-bottom-color:var(--wheat)}
+  .notes h2[id]{scroll-margin-top:72px}
+}
+
+@media (max-width:1000px){ .turn-grid{grid-template-columns:1fr} .turn-side{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))} }
+@media (max-width:900px){
+  .board,.lobby,.hero,.learn,.tut .body{grid-template-columns:1fr}
+  .fan{height:260px}
+  .handgrid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .card{--w:142px;min-height:220px}
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .stat .v{font-size:20px}
+  .charts,.voices,.setup-names{grid-template-columns:1fr}
+  .year{font-size:44px}
+  .sheet{padding:18px}
+  .exam .row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.flip::before,.confetti,.stamp{display:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+<div id="popwrap"></div>
+
+<script>
+/* =========================================================
+   CONTENT: cards, events, quiz. This is where the theory lives.
+   ========================================================= */
+const ICONS = {
+  early:'<svg viewBox="0 0 40 40"><circle cx="15" cy="21" r="8"/><circle cx="25" cy="21" r="8"/><path d="M20 6l2 4h-4z"/></svg>',
+  late:'<svg viewBox="0 0 40 40"><path d="M11 6h18M11 34h18M13 6c0 9 14 9 14 14s-14 5-14 14M27 6c0 9-14 9-14 14s14 5 14 14"/><path d="M17 30h6"/></svg>',
+  control:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12"/><path d="M11.5 28.5l17-17"/></svg>',
+  tavern:'<svg viewBox="0 0 40 40"><path d="M10 12h16v20a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2z"/><path d="M26 16h4a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3h-4"/><path d="M10 12c1-4 5-5 8-3 2-3 7-2 8 3"/></svg>',
+  boom:'<svg viewBox="0 0 40 40"><circle cx="20" cy="15" r="6"/><path d="M20 3v3M8 15h3M29 15h3M11.5 6.5l2 2M28.5 6.5l-2 2"/><circle cx="14" cy="30" r="5"/><circle cx="26" cy="30" r="5"/></svg>',
+  relief:'<svg viewBox="0 0 40 40"><path d="M7 25c0-7 6-12 13-12s13 5 13 12v2H7z"/><path d="M14 16l-2 5M20 14v6M26 16l2 5"/></svg>',
+  union:'<svg viewBox="0 0 40 40"><rect x="5" y="15" width="17" height="10" rx="5"/><rect x="18" y="15" width="17" height="10" rx="5"/></svg>',
+  improve:'<svg viewBox="0 0 40 40"><path d="M20 34V16"/><path d="M20 22c-6 0-9-4-9-9 6 0 9 4 9 9zM20 18c0-6 4-9 9-9 0 6-4 9-9 9z"/><path d="M8 34h24"/></svg>',
+  emigrate:'<svg viewBox="0 0 40 40"><path d="M6 26h28l-4 6H10z"/><path d="M20 26V6"/><path d="M20 8l10 14H20M20 10l-8 12h8"/></svg>',
+  mill:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6"/><circle cx="20" cy="20" r="12" stroke-dasharray="4 3.4" stroke-width="5"/></svg>',
+  friendly:'<svg viewBox="0 0 40 40"><rect x="8" y="16" width="24" height="16" rx="2"/><path d="M8 22h24"/><path d="M16 16v-3a4 4 0 0 1 8 0v3"/><circle cx="20" cy="27" r="1.5"/></svg>',
+  glean:'<svg viewBox="0 0 40 40"><path d="M20 34V10"/><path d="M20 14l-5-4M20 14l5-4M20 20l-5-4M20 20l5-4M20 26l-5-4M20 26l5-4"/><path d="M10 34h20"/></svg>',
+  workhouse:'<svg viewBox="0 0 40 40"><path d="M6 34V16l14-9 14 9v18z"/><path d="M16 34v-8h8v8"/><path d="M11 20h4M25 20h4"/><path d="M20 7v-3"/></svg>',
+  godwin:'<svg viewBox="0 0 40 40"><path d="M20 10c-4-3-9-3-13-1v23c4-2 9-2 13 1 4-3 9-3 13-1V9c-4-2-9-2-13 1z"/><path d="M20 10v23"/></svg>',
+  petition:'<svg viewBox="0 0 40 40"><path d="M11 5h14l5 5v25H11z"/><path d="M25 5v5h5"/><path d="M15 16h11M15 21h11M15 26h7"/></svg>',
+  fruitful:'<svg viewBox="0 0 40 40"><circle cx="20" cy="11" r="4"/><circle cx="10" cy="22" r="3.5"/><circle cx="30" cy="22" r="3.5"/><circle cx="15" cy="31" r="3"/><circle cx="25" cy="31" r="3"/><path d="M20 15v6M14 20l3 2M26 20l-3 2"/></svg>',
+  service:'<svg viewBox="0 0 40 40"><circle cx="16" cy="11" r="4"/><path d="M10 34V22a6 6 0 0 1 12 0v12"/><path d="M24 22h10M30 18l4 4-4 4"/></svg>',
+  thrift:'<svg viewBox="0 0 40 40"><path d="M8 30h24"/><path d="M11 30v-6h18v6"/><path d="M14 24v-5h12v5"/><path d="M17 19v-5h6v5"/></svg>',
+  feast:'<svg viewBox="0 0 40 40"><path d="M13 6v10a4 4 0 0 0 8 0V6"/><path d="M17 20v14M12 34h10"/><path d="M28 6c-3 3-3 9 0 12v16"/></svg>',
+  poach:'<svg viewBox="0 0 40 40"><path d="M10 30c0-7 5-12 12-12 5 0 9 3 9 8 0 3-2 5-5 5H12a2 2 0 0 1-2-1z"/><path d="M22 18c-1-5 0-10 2-12 1 4 1 8-1 12M26 19c1-5 4-9 7-10-1 4-3 8-6 11"/><circle cx="28" cy="24" r="1"/></svg>',
+  allotment:'<svg viewBox="0 0 40 40"><rect x="6" y="20" width="28" height="14" rx="1"/><path d="M6 27h28M15 20v14M25 20v14"/><path d="M20 20v-8M20 14c-3 0-5-2-5-5 3 0 5 2 5 5zM20 12c0-3 2-5 5-5 0 3-2 5-5 5z"/></svg>',
+  charity:'<svg viewBox="0 0 40 40"><path d="M6 26l6-2 8 3h6a2 2 0 0 1 0 4h-8"/><path d="M6 32l6-2 10 3 12-7a2 2 0 0 0-2-3l-8 4"/><circle cx="24" cy="12" r="5"/></svg>',
+  love:'<svg viewBox="0 0 40 40"><path d="M20 33S7 25 7 15a6.5 6.5 0 0 1 13-2 6.5 6.5 0 0 1 13 2c0 10-13 18-13 18z"/></svg>',
+  celibate:'<svg viewBox="0 0 40 40"><circle cx="20" cy="12" r="5"/><path d="M12 34V25a8 8 0 0 1 16 0v9"/></svg>',
+  parish:'<svg viewBox="0 0 40 40"><path d="M20 4v6M17 7h6"/><path d="M12 34V18l8-6 8 6v16z"/><path d="M17 34v-7a3 3 0 0 1 6 0v7"/><circle cx="15" cy="22" r="1"/><circle cx="25" cy="22" r="1"/></svg>',
+  elder:'<svg viewBox="0 0 40 40"><circle cx="17" cy="10" r="4"/><path d="M11 34l3-13h6l2 7"/><path d="M26 16v18"/><path d="M26 16c0-2 3-2 3 0"/></svg>',
+  loom:'<svg viewBox="0 0 40 40"><rect x="7" y="8" width="26" height="24" rx="1"/><path d="M12 8v24M17 8v24M22 8v24M27 8v24"/><path d="M7 16h26M7 24h26"/></svg>',
+  lodgers:'<svg viewBox="0 0 40 40"><path d="M6 34V16l14-10 14 10v18z"/><path d="M13 34v-9h6v9"/><path d="M23 20h6v5h-6z"/><circle cx="26" cy="31" r="2"/><path d="M28 31h4"/></svg>',
+  manchester:'<svg viewBox="0 0 40 40"><path d="M5 34V20l7 4v-4l7 4v-4l7 4V10h5v24z"/><path d="M28 10c0-3 3-4 3-7M33 10c0-3 3-4 2-7"/></svg>',
+  machines:'<svg viewBox="0 0 40 40"><path d="M8 32l14-14"/><path d="M18 14l8 8 6-6-8-8z"/><circle cx="12" cy="12" r="5" stroke-dasharray="3 2.4" stroke-width="3"/></svg>'
+};
+const BULB = '<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>';
+
+const FAMILY = {
+  early:{title:'Marry Young', births:.40, virtue:0,
+    fx:()=>'<b class="up">+40% births.</b> More hands, but <b class="down">more mouths</b> to feed.',
+    quote:'“The passion between the sexes is necessary, and will remain nearly in its present state.”'},
+  late:{title:'Moral Restraint', births:.10, virtue:2,
+    fx:()=>'<b class="up">+10% births.</b> Delay marriage. <b class="up">The parson approves.</b>',
+    quote:'“Restraint from marriage which is not followed by irregular gratifications.”'},
+  boom:{title:'Wait for Good Times', births:.40, virtue:1,
+    fx:()=>'<b class="up">+40% births</b>, but only if last season’s wage was at least 1.10.',
+    quote:'Marriages rise and fall with wages: the heart of the wage cycle.'},
+  fruitful:{title:'A Fruitful Marriage', births:.55, virtue:0,
+    fx:()=>'<b class="up">+55% births.</b> A houseful of children, and <b class="down">many more mouths</b>.',
+    quote:'Population, unchecked, “increases in a geometrical ratio.”'},
+  service:{title:'Send the Eldest into Service', births:.15, virtue:1,
+    fx:()=>'<b class="up">+15% births.</b> One grown child <b class="up">leaves to work as a servant</b>: one less mouth, and they still count toward your Legacy.',
+    quote:'Domestic service took thousands of young people off the parish.'},
+  thrift:{title:'Live Frugally', births:.10, virtue:1,
+    fx:()=>'<b class="up">+10% births.</b> Any surplus is saved at <b class="up">×1.25</b>. The parson approves.',
+    quote:'Malthus praised “frugality” and blamed its absence among the poor.'},
+  feast:{title:'Hold a Wedding Feast', births:.20, virtue:0,
+    fx:()=>'<b class="up">+20% births</b> and <b class="up">+2 comfort</b>, but the feast costs <b class="down">1 savings</b>.',
+    quote:'Village weddings were the great festivals of the laboring year.'},
+  love:{title:'Marry for Love', births:.30, virtue:0,
+    fx:()=>'<b class="up">+30% births</b> and <b class="up">+1 comfort</b>. Happiness now, and <b class="down">more mouths</b> later.',
+    quote:'Malthus granted that marriage brings happiness, and blamed its haste.'},
+  celibate:{title:'Stay Single', births:0, virtue:3,
+    fx:()=>'<b>No births.</b> <b class="up">+1 savings</b> from a smaller household. <b class="up">The parson praises you highly.</b>',
+    quote:'The same result as birth control, yet Malthus called one virtue and the other vice.'},
+  parish:{title:'Marry on the Parish', births:.40, virtue:-1,
+    fx:()=>'<b class="up">+40% births.</b> If you fall short, the parish pays <b class="up">up to 2 loaves</b>, <b class="down">taken from next season’s food</b>.',
+    quote:'Malthus claimed the poor laws let the poor marry with no prospect of support.'},
+  elder:{title:'Take In an Aging Parent', births:.10, virtue:1,
+    fx:()=>'<b class="up">+10% births.</b> Grandparent moves in: <b class="down">+1 mouth</b> to feed, <b class="up">+2 comfort</b>.',
+    quote:'Families, not the parish, cared for most of the old.'},
+  loom:{title:'Work the Loom at Home', births:.20, virtue:1,
+    fx:()=>'<b class="up">+20% births.</b> The whole family weaves: <b class="up">+0.15 loaves</b> per family member.',
+    quote:'Handloom weaving kept cottage families afloat until the power loom.'},
+  lodgers:{title:'Take In Lodgers', births:.10, virtue:0,
+    fx:()=>'<b class="up">+10% births.</b> Rent a corner of the cottage: <b class="up">+1.5 loaves</b> this season.',
+    quote:'Overcrowding in the industrial towns began in rooms like these.'},
+  control:{title:'Prevent Births', births:0, virtue:-2,
+    fx:()=>'<b>No births.</b> Malthus files this under <b class="down">vice</b>.',
+    quote:'Malthus condemned birth control as a vice.'},
+  tavern:{title:'To the Ale-House', births:.25, virtue:-2,
+    fx:()=>'<b class="up">+25% births.</b> Any surplus becomes <b class="up">comfort ×1.5</b>, but you <b class="down">save nothing</b>.',
+    quote:'“All that is beyond their present necessities goes … to the ale-house.”'}
+};
+function birthRate(k, s){ const f=FAMILY[k]; if(k==='boom') return s.lastWage>=1.1 ? f.births : 0; return f.births; }
+
+const ACTIONS = {
+  relief:{title:'Petition the Parish', weight:4,
+    fx:s=>`If you fall short, poor relief covers <b class="up">up to ${s.reliefCap} loaves</b>. It is <b class="down">taken from next season’s food</b> as the poor rate.`,
+    quote:'The Speenhamland system, 1795.'},
+  workhouse:{title:'Enter the Workhouse', weight:2,
+    fx:()=>'Covers <b class="up">your whole shortfall</b>, but costs <b class="down">−2 comfort</b> and the parson’s respect. <b class="down">Repaid from next season’s food.</b>',
+    quote:'Food eaten in workhouses, Malthus complained, goes to the least “valuable.”'},
+  union:{title:'Join a Combination', weight:3,
+    fx:s=>`Your wage <b class="up">×1.25</b> this season. <b class="down">${Math.round(s.unionRisk*100)}% risk</b> of prosecution: fined 3 savings, or a relative is transported.`,
+    quote:'Outlawed by the Combination Act, 1799.'},
+  improve:{title:'Improve the Land', weight:3, cost:3,
+    fx:s=>`Pay <b class="down">3 savings</b>: the harvest grows <b class="up">+${IMPROVE_GAINS[Math.min(s.improvements,7)]} more every season</b>, for everyone.`,
+    quote:'Food rises at most “in arithmetical progression.”'},
+  emigrate:{title:'Emigrate to America', weight:3, cost:2,
+    fx:()=>'Pay <b class="down">2 savings</b>: 2 relatives sail away. They <b class="up">count toward your Legacy</b> and stop eating parish bread.',
+    quote:'Emigration relieves pressure, but only for a time.'},
+  mill:{title:'Children to the Mill', weight:3,
+    fx:()=>'<b class="up">+0.25 loaves</b> per family member this season. <b class="down">30% chance</b> of an accident: a child is lost.',
+    quote:'Pauper apprentices worked 14 to 18 hour days.'},
+  friendly:{title:'Join a Friendly Society', weight:3,
+    fx:()=>'Pay into a savings club: <b class="up">savings +20%</b> (at least 1, at most 3). <b class="up">The parson approves.</b>',
+    quote:'Malthus praised saving as proof of prudence.'},
+  glean:{title:'Glean the Fields', weight:3,
+    fx:()=>'Gather the grain left after the harvest: <b class="up">+2 loaves</b> this season. Small, but safe.',
+    quote:'An old customary right of the rural poor.'},
+  godwin:{title:'Read Godwin', weight:2,
+    fx:()=>'Radical hope: <b class="up">+2 comfort</b>. The parson <b class="down">disapproves</b>.',
+    quote:'Godwin blamed poverty on property, not on the poor.'},
+  petition:{title:'Petition Against the Corn Laws', weight:2,
+    fx:s=>s.cornLaw?'<b class="up">35% chance</b> Parliament repeals the Corn Law for everyone.':'No Corn Law is in force yet, so this has no effect until one passes.',
+    quote:'The corn laws were finally repealed in 1846.'},
+  poach:{title:'Poach the Squire’s Game', weight:2,
+    fx:()=>'<b class="up">+3 loaves</b> of rabbit and pheasant. <b class="down">30% risk</b> of being caught: fined 3 savings, or a relative is transported.',
+    quote:'The Game Laws made poaching a transportable crime.'},
+  allotment:{title:'Rent an Allotment', weight:3, cost:1,
+    fx:()=>'Pay <b class="down">1 savings</b> for a garden plot: <b class="up">+0.4 loaves</b> per family member this season.',
+    quote:'Reformers urged plots of land so laborers could feed themselves.'},
+  charity:{title:'Ask the Squire’s Charity', weight:3,
+    fx:()=>'If you fall short, private charity covers <b class="up">up to 2 loaves</b>, and it is <b class="up">not taken from the parish</b>.',
+    quote:'Malthus preferred private charity to a legal right to relief.'},
+  manchester:{title:'Seek Work in Manchester', weight:3,
+    fx:()=>'Tramp to the mill towns: <b class="up">+2.5 loaves</b> this season. <b class="down">20% risk</b> a relative catches fever in the slums.',
+    quote:'“Civilization works its miracles, and civilized man is turned back almost into a savage.” (Tocqueville on Manchester)'},
+  machines:{title:'Break the Machines', weight:2,
+    fx:s=>`Strike back with the Luddites: <b class="up">+2 comfort</b>. <b class="down">${Math.round(s.unionRisk*100)}% risk</b> a relative is hanged or transported.`,
+    quote:'Frame-breaking became a capital crime in 1812.'}
+};
+function affordable(k, p){
+  if(!p) return true;
+  if(k==='improve') return p.savings>=3;
+  if(k==='emigrate') return p.savings>=2 && p.family>2;
+  if(k==='allotment') return p.savings>=1;
+  return true;
+}
+function lockReason(k, p){ return k==='emigrate' && p.savings>=2 ? 'Need more than 2 family' : `Can’t afford: needs ${ACTIONS[k].cost} savings`; }
+
+const EVENTS = [
+  {id:'bumper', title:'A Bumper Harvest', y0:1798, y1:1833, mult:1.2, fx:'Harvest ×1.2 this season.',
+    m:'Plenty only encourages marriage. Watch the births that follow.',
+    h:'Hunt: In Malthus’s scheme, even good fortune ends in misery. The logic always points back to poverty.'},
+  {id:'dearth', title:'Harvest Failure', y0:1798, y1:1833, mult:.75, fx:'Harvest ×0.75 this season.',
+    m:'When food runs short, the positive checks of famine and sickness do their work.',
+    h:'Hunt: In the 1790s wheat rose from 46 to 128 shillings a quarter, and the poor paid the price.'},
+  {id:'war', title:'War with France', y0:1798, y1:1815, mult:.85, fx:'Blockades cut grain imports: harvest ×0.85.',
+    m:'War is among the positive checks that keep population level with subsistence.',
+    h:'Hunt: The wars cut off food imports. Money wages rose, but the bread they bought fell.'},
+  {id:'typhus', title:'Typhus in the Courts', y0:1798, y1:1833, mult:1, kill:.10, fx:'Every household and the parish lose 10% of their people.',
+    m:'Disease is misery: a positive check on population.',
+    h:'Hunt: Malthus even argued that we should “court the return of the plague” rather than fight it.'},
+  {id:'enclosure', title:'Enclosure & Turnips', y0:1798, y1:1833, mult:1, growth:1.5, fx:'New husbandry: the harvest grows +1.5 more every season.',
+    m:'Improvement raises food, but only by equal steps, never by doubling.',
+    h:'Hunt: Enclosure raised output and pushed cottagers off the land into the factory towns.'},
+  {id:'cornlaw', title:'The Corn Law of 1815', y0:1813, y1:1833, mult:1, cornLaw:true, fx:'Grain imports barred below 80s. Landlords take 10% of the harvest as rent until it is repealed.',
+    m:'By now Malthus defended the landlords. He thought high rents a sign of a prosperous nation.',
+    h:'Hunt: The corn laws shifted surplus from capitalists’ profits to landlords’ rents. The workers paid either way.'},
+  {id:'speenham', title:'The Scale Is Raised', y0:1798, y1:1825, mult:1, reliefCap:2, fx:'Justices raise the bread scale: poor relief covers +2 more loaves.',
+    m:'Poor laws “increase population without increasing the food for its support.”',
+    h:'Hunt: The Speenhamland system had real flaws, but Malthus opposed any aid to the poor at all.'},
+  {id:'inquiry', title:'The Poor Law Inquiry', y0:1815, y1:1833, mult:1, reliefCap:-2, fx:'Reformers, citing Malthus, cut relief: it covers 2 fewer loaves.',
+    m:'Relief “diminishes the shares that would otherwise belong to more industrious and more worthy members.”',
+    h:'Hunt: Arguments for abolishing relief were largely built on Malthus’s ideas.'},
+  {id:'luddite', title:'The Luddite Trials', y0:1806, y1:1822, mult:1, unionRisk:.6, fx:'Machine-breakers hanged. The risk of joining a combination rises to 60%.',
+    m:'Unrest only proves the folly of promising the poor what nature forbids.',
+    h:'Hunt: The Luddite revolts ended in 1813 with mass hangings and transportations.'},
+  {id:'newmill', title:'A New Mill Opens', y0:1798, y1:1833, mult:1, millBoost:true, fx:'Mill work pays double this season.',
+    m:'Industry may employ the surplus hands, for a while.',
+    h:'Hunt: Children were sold to mills “in lots of fifty, eighty or a hundred” by poor-law authorities.'},
+  {id:'godwin', title:'Godwin’s Pamphlet', y0:1798, y1:1815, mult:1, comfort:1, fx:'Radical ideas spread hope: every household gains +1 Comfort.',
+    m:'Even a perfectly equal society would soon divide into “a class of proprietors, and a class of labourers.”',
+    h:'Hunt: Godwin blamed poverty on property and on a government run by the rich. The 1798 Essay was written to refute him.'},
+  {id:'cholera', title:'Cholera', y0:1829, y1:1833, mult:1, kill:.10, fx:'The epidemic of 1832: everyone loses 10%.',
+    m:'Nature’s “mighty process” always keeps population and food level.',
+    h:'Hunt: Cholera and typhoid hit the crowded, filthy industrial cities hardest after 1830.'},
+  {id:'census', title:'The First Census', y0:1798, y1:1805, mult:1, fx:'Britain counts its people for the first time (1801). No other effect, but everyone now argues about the numbers.',
+    m:'The census was taken partly because my Essay made the nation anxious about its numbers.',
+    h:'Hunt: Malthus turned population into a political weapon. The count was used to argue that the poor were multiplying too fast.'},
+  {id:'vaccine', title:'Jenner’s Vaccine', y0:1798, y1:1833, mult:1, addPeople:1, npcGrow:.05, fx:'Smallpox vaccination spreads. Fewer children die: every household gains +1 member and the parish grows 5%.',
+    m:'Remove one positive check and another must take its place. More survivors means more mouths.',
+    h:'Hunt: Malthus opposed “specific remedies” for disease, as if saving lives were a mistake.'},
+  {id:'nosummer', title:'The Year Without a Summer', y0:1814, y1:1818, mult:.7, fx:'A volcanic eruption darkens the skies (1816): harvest ×0.7 this season.',
+    m:'The food supply, not human wishes, sets the limit of population.',
+    h:'Hunt: Bread riots broke out across England in 1816. For the poor, a bad harvest meant hunger, not an abstraction.'},
+  {id:'imports', title:'Cheap Baltic Grain', y0:1798, y1:1814, mult:1.15, fx:'Grain ships reach port: harvest ×1.15 this season.',
+    m:'Imports only postpone the reckoning: people soon multiply to eat the extra grain.',
+    h:'Hunt: Cheap imports helped workers and manufacturers, which is exactly why the landlords fought for the Corn Laws.'},
+  {id:'savingsbank', title:'Savings Banks Open', y0:1815, y1:1833, mult:1, savingsGain:1, fx:'The Savings Banks Act (1817) pays interest: every household gains +1 savings.',
+    m:'Savings banks teach the poor the prudence that alone can raise them.',
+    h:'Hunt: Thrift was preached to people who could barely afford bread.'},
+  {id:'bankfail', title:'The Panic of 1825', y0:1824, y1:1830, mult:1, savingsLoss:.25, fx:'Country banks collapse: every household loses a quarter of its savings.',
+    m:'Such distress cannot be prevented by any sacrifice of the rich.',
+    h:'Hunt: Malthus’s own theory of gluts said capitalism could fall into slumps where goods went unsold.'},
+  {id:'peterloo', title:'The Peterloo Massacre', y0:1817, y1:1822, mult:1, unionRisk:.6, comfort:-1, fx:'Cavalry charge a reform meeting in Manchester (1819). Combination risk rises to 60%, and every household loses 1 comfort.',
+    m:'Radical agitation promises the poor what nature has forbidden.',
+    h:'Hunt: The ruling classes feared united workers and answered them with force and the law.'},
+  {id:'swing', title:'The Swing Riots', y0:1829, y1:1833, mult:.9, unionRisk:.6, fx:'Farm laborers burn ricks and smash threshing machines (1830). Harvest ×0.9, combination risk 60%.',
+    m:'Violence cannot raise wages above what the food supply allows.',
+    h:'Hunt: The rural poor rose against machines that took their winter work. Hundreds were transported.'}
+];
+
+const QUIZ = [
+  {q:'Unchecked, how did Malthus say population grows?', o:['Arithmetically: 1, 2, 3, 4…','Geometrically: 1, 2, 4, 8…','It stays roughly constant'], a:1,
+    x:'This asks for the first half of Malthus’s basic model: how fast people multiply when nothing holds them back.',
+    e:'Each generation has children in proportion to its size, so growth compounds. Malthus said an unchecked population doubles about every 25 years.'},
+  {q:'On a fixed territory, food production can grow at best…', o:['Geometrically','Arithmetically','Not at all'], a:1,
+    x:'This is the second half of the model: how fast the food supply can grow on a limited amount of land.',
+    e:'At best each generation adds the same amount of food as the last, and in practice the additions shrink (diminishing returns). That is why the harvest in this game grows by a fixed number.'},
+  {q:'Which of these is a PREVENTIVE check?', o:['Famine','Late marriage','Plague'], a:1,
+    x:'Malthus split the forces holding population down into two kinds. Preventive checks work on births.',
+    e:'Late marriage lowers the birth rate, so it is preventive. Famine and plague raise the death rate, so they are positive checks.'},
+  {q:'Which of these is a POSITIVE check?', o:['Abstinence','War','Sterility'], a:1,
+    x:'Positive checks are the other kind: they work by raising the death rate.',
+    e:'War kills people, so it is a positive check. Abstinence and sterility reduce births, which makes them preventive.'},
+  {q:'Malthus defined “moral restraint” as…', o:['Delaying marriage without sex outside it','Using birth control','Drinking less ale'], a:0,
+    x:'This asks for the one check Malthus approved of morally.',
+    e:'Moral restraint meant waiting to marry and staying chaste until then. He called birth control a vice. That is why the parson frowns at the Prevent Births card.'},
+  {q:'If wages rise above subsistence, Malthus predicts…', o:['Workers save it all','Population grows until wages fall back','Wages keep rising'], a:1,
+    x:'This is the population–wage link: what happens after a good stretch for workers.',
+    e:'Higher wages bring earlier marriages and more children. More workers and more mouths push the wage back down to subsistence. You can watch this cycle on the wage chart.'},
+  {q:'One of Malthus’s objections to the Poor Laws was that they…', o:['Raise population without raising food','Cost landlords too little','Encourage emigration'], a:0,
+    x:'This asks why Malthus opposed welfare (the Poor Laws).',
+    e:'Relief lets families survive and grow while the food supply stays the same, so wages fall for everyone. His second objection was that it takes food from “more worthy” members.'},
+  {q:'If pay rose from 18 pence to 5 shillings a day, Malthus said workers would…', o:['Eat meat daily and thrive','Work less and end up worse off','Emigrate'], a:1,
+    x:'This refers to Malthus’s example of the rich tripling workers’ pay through a subscription.',
+    e:'He claimed workers would feel rich, take more leisure and produce less, so the nation and the workers would both end up poorer.'},
+  {q:'Malthus sorted all checks into moral restraint, vice, and…', o:['Charity','Misery','Industry'], a:1,
+    x:'This is his second, moral way of classifying the checks.',
+    e:'Moral restraint, vice and misery. This moral framing let him portray the rich as virtuous and the poor as lacking restraint.'},
+  {q:'Hunt’s central critique is that Malthus’s theory…', o:['Blames the poor and defends the wealthy','Overestimates food growth','Ignores money'], a:0,
+    x:'This asks what Hunt and Lautzenheiser think is wrong with the theory.',
+    e:'Hunt argues the theory makes poverty look natural and inevitable and blames it on the poor’s morals, which conveniently protects the property of the wealthy.'},
+  {q:'According to Malthus, what escape from poverty remains open to the poor?', o:['Redistribution of wealth','Moral restraint','Poor relief'], a:1,
+    x:'This asks what Malthus thought the poor could actually do about their situation.',
+    e:'He rejected redistribution and relief, and said only delaying marriage (moral restraint) could keep a family above subsistence.'},
+  {q:'What is the “subsistence” wage?', o:['Just enough to live and raise the next generation of workers','A generous family wage','The legal minimum wage'], a:0,
+    x:'This checks the key term at the center of the population–wage link.',
+    e:'Subsistence is the bare minimum to survive and replace the workforce. Malthus argued wages always drift back to it. In this game it is 1.00 loaf per person.'},
+  {q:'How often did Malthus say an unchecked population doubles?', o:['Every 10 years','Every 25 years','Every 100 years'], a:1,
+    x:'This asks for the specific number behind “geometric growth.”',
+    e:'Malthus claimed unchecked population doubles about every 25 years, based largely on the growth of the American colonies.'},
+  {q:'If population grows 10% while food grows 5%, the real wage…', o:['Rises','Falls','Stays the same'], a:1,
+    x:'This asks you to apply the formula: real wage = food ÷ mouths.',
+    e:'When mouths grow faster than food, each person’s share shrinks, so the real wage falls. That is the gap between geometric and arithmetic growth.'},
+  {q:'According to Malthus, what happens if the rich give their money to the poor?', o:['Poverty ends','The poor have more children and fall back to subsistence','The rich become poor'], a:1,
+    x:'This asks about Malthus’s argument against redistribution.',
+    e:'He claimed extra income would only encourage more births, pushing everyone back to subsistence. That is why he opposed redistribution.'},
+  {s:'model', q:'Population never actually doubles every 25 years for long. So what question did Malthus set out to answer?', o:['What forces check population growth?','Why people stop wanting children','How food can grow geometrically'], a:0,
+    x:'This asks for the central question behind the checks.',
+    e:'If population could grow geometrically but never does for long, something must be holding it back. Malthus’s answer is the preventive and positive checks.'},
+  {s:'checks', q:'How did Malthus classify birth control?', o:['As a preventive check he recommended','As a vice','As a positive check'], a:1,
+    x:'This asks where birth control fits in Malthus’s moral scheme.',
+    e:'Birth control lowers births, but Malthus refused to recommend it. He called it a vice that degrades human nature, and approved only of delayed marriage.'},
+  {s:'checks', q:'Hunt argues Malthus’s moral classification of the checks mainly served to…', o:['Portray the rich as virtuous and the poor as improvident','Encourage birth control','Prove that food grows geometrically'], a:0,
+    x:'This asks about Hunt’s reading of “moral restraint, vice and misery.”',
+    e:'By tying restraint to virtue, Malthus made wealth look like a reward for good character and poverty like a punishment for vice. He said the poor spend any surplus at the ale-house.'},
+  {s:'wages', q:'Later economists named Malthus’s wage idea the…', o:['Iron law of wages','Law of diminishing utility','Minimum wage principle'], a:0,
+    x:'This asks for the common name for the theory that wages settle at subsistence.',
+    e:'The “iron law of wages” (or subsistence theory of wages) says wages cannot stay above subsistence for long. Hunt doesn’t use the label, but it is what the theory implies.'},
+  {s:'wages', q:'In the 18-pence example, why does raising wages “fail twice”?', o:['Workers work less now, and have more children later','Taxes rise and then rents rise','Employers cut jobs twice'], a:0,
+    x:'This asks you to connect the short-run and long-run arguments.',
+    e:'In the short run, Malthus claimed higher pay makes workers take more leisure and produce less. In the long run, it brings more births that push wages back to subsistence.'},
+  {s:'policy', q:'Malthus’s second objection to the Poor Laws was that food eaten in workhouses…', o:['Shrinks the shares of “more industrious and more worthy” members','Is too expensive to import','Makes workers unhealthy'], a:0,
+    x:'This asks for the objection that pairs with “population without food.”',
+    e:'He argued the food consumed by paupers is taken from the shares that would otherwise go to the industrious, so relief makes the whole working class poorer.'},
+  {s:'apply', q:'The harvest is 60 loaves and there are 50 mouths. What is the real wage?', o:['1.20: above subsistence, so families can save','0.83: below subsistence, so savings drain','1.00: exactly subsistence'], a:0,
+    x:'This asks you to use the game’s core formula: real wage = food ÷ mouths.',
+    e:'60 ÷ 50 = 1.20 loaves per person, above the 1.00 subsistence line. Malthus would predict that this surplus encourages more marriages and births next season.'},
+  {s:'apply', q:'A plague kills 20% of the parish while the harvest stays the same. What happens to the wage?', o:['It rises, because fewer mouths share the same food','It falls, because fewer people work the land','It stays the same'], a:0,
+    x:'This asks how a positive check affects wages.',
+    e:'With the same food and fewer people, each person’s share grows, so the wage rises. Malthus would add that the higher wage soon brings more births, which pull it back down.'},
+  {s:'apply', q:'The wage has stayed at 1.30 for two seasons. What does Malthus predict happens next?', o:['More marriages and births pull the wage back toward subsistence','Wages keep rising for good','Workers save until they become landlords'], a:0,
+    x:'This asks you to run the population–wage cycle forward.',
+    e:'A lasting surplus encourages earlier marriage and more children. As the population grows faster than food, the wage falls back toward 1.00. That is the cycle on the game’s wage chart.'},
+  {s:'apply', q:'Poor relief keeps a starving family alive this season. According to Malthus, what happens to everyone’s wage next season?', o:['It falls: there are more mouths but no more food','It rises, because relief boosts demand','Nothing changes'], a:0,
+    x:'This asks you to apply Malthus’s objection to the Poor Laws.',
+    e:'Relief keeps people alive without adding any food, so the same harvest is split among more mouths and the wage falls for everyone. In the game, relief is also charged to next season’s food.'}
+];
+const QSECTIONS = [['model','The core model'],['checks','The checks'],['wages','Theory of wages'],['apply','Applying the model'],['policy','Policy & Hunt’s critique']];
+['model','model','checks','checks','checks','wages','policy','wages','checks','policy','policy','wages','model','wages','policy']
+  .forEach((s,i)=>{ if(!QUIZ[i].s) QUIZ[i].s = s; });
+const secName = s => (QSECTIONS.find(x=>x[0]===s)||[,''])[1];
+
+const HINTS = {
+  season:['Season & year','Each season covers a few years of parish life, from 1798 to 1833. The bar shows how many seasons are left in your game.'],
+  pop:['Mouths in the parish','Everyone who must eat: all households plus the rest of the parish. Births are a <b>percentage</b> of each family, so it grows <b>geometrically</b> (it compounds).'],
+  food:['Harvest','The food the parish produces this season. It grows by the same fixed amount each season, so it grows <b>arithmetically</b>. Events, the Corn Law and land improvements change it.'],
+  wage:['Real wage','Harvest ÷ mouths = loaves per person. <b>1.00 is subsistence.</b> Above 1 you save a <b class="up">surplus</b>. Below 1 your savings <b class="down">drain</b>, and then people die.'],
+  chartpf:['Mouths vs. loaves','The red line is population and the gold line is food. When red climbs above gold, the wage drops below subsistence.'],
+  chartw:['The wage cycle','The blue line is the real wage and the dashed line is subsistence. Watch it swing above and below 1: Malthus’s wage cycle.'],
+  event:['Event card','This season’s event is shown ahead of time and strikes at harvest. Plan around it.'],
+  houses:['Households','Each figure is a person: cream = living, <span style="color:#2f5a86">blue</span> = emigrated, dashed red = lost. The goal is the highest Legacy.'],
+  legacy:['Legacy (your score)','Legacy = family + emigrants + savings + comfort − 2 × each relative lost. The parson’s opinion does <b>not</b> count.'],
+  npc:['The rest of the parish','Poor families the game controls. When wages are high they have more children, exactly as Malthus predicts.'],
+  famcards:['Household cards','Pick exactly <b>one</b>. It sets how many children your family has this season. Births are a percentage of your family, so bigger families grow faster.'],
+  actcards:['Action cards','Optional: play one or none. A played card is replaced next season. <b class="up">Green</b> words help you and <b class="down">red</b> words cost you. Greyed-out cards are ones you can’t afford yet.'],
+  pstats:['Your household','Your family, savings, comfort and Legacy right now. Savings protect you when the wage falls below 1.'],
+  glance:['The parish at a glance','Last season’s real wage, this season’s harvest, and the number of mouths it must feed. Open the full board between seasons to see the charts.'],
+  quiz:['The question','Answer for <b class="up">+1 savings</b>. The answer and an explanation appear in the harvest report.'],
+  lock:['Lock in','When you’ve chosen, lock in. The season resolves once every household has locked in.'],
+  rwage:['This harvest’s wage','Food available ÷ mouths. Compare it to 1.00 (subsistence).'],
+  rtable:['What happened','Each household’s season, step by step. <b class="up">Green</b> = gains, <b class="down">red</b> = losses.'],
+  rexam:['The question, explained','What the question was asking, the right answer, and why it matters for Malthus’s theory.'],
+  rvoices:['Two voices','Malthus explains the season on his own terms. Hunt’s critique from the textbook answers him.'],
+  seasons:['Game length','More seasons show more of the wage cycle. Each game runs from 1798 to 1833, so the years between seasons change with the length.']
+};
+
+const PARSON = v => v >= 6 ? 'The parson calls them “deserving poor.”' : v >= 2 ? 'The parson nods approvingly.' : v > -2 ? 'The parson reserves judgement.' : v > -6 ? 'The parson frowns at their improvidence.' : 'The parson preaches against them by name.';
+
+/* =========================================================
+   ENGINE: pure and seeded, identical for local and online play
+   ========================================================= */
+function hash(s){let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19}return (h>>>0)}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const FAM_WEIGHT = {early:3, late:3, boom:2, control:2, tavern:2, fruitful:2, service:2, thrift:2, feast:2, love:2, celibate:2, parish:2, elder:2, loom:2, lodgers:2};
+function drawN(weights, n, rng){
+  const out = [], w = {...weights};
+  for(let j=0;j<n;j++){
+    const pool=[]; for(const k in w) for(let i=0;i<w[k];i++) pool.push(k);
+    if(!pool.length) break;
+    const k = pool[Math.floor(rng()*pool.length)]; out.push(k); delete w[k];
+  }
+  return out;
+}
+const ACT_WEIGHT = () => Object.fromEntries(Object.keys(ACTIONS).map(k=>[k,ACTIONS[k].weight]));
+function dealHands(p, rng){ p.famHand = drawN(FAM_WEIGHT, 3, rng); p.hand = drawN(ACT_WEIGHT(), 3, rng); }
+const r1 = x => Math.round(x*10)/10;
+const yearAt = (r, max) => max<=1 ? 1798 : 1798 + Math.round((r-1)*35/(max-1));
+const yearOf = (r, s) => yearAt(r, s ? s.maxRounds : 8);
+const IMPROVE_GAINS = [2, 1.5, 1, .5, .5, .5, .5, .5];
+const MIN_SEASONS = 3, MAX_SEASONS = 12;
+
+function newGame(plist, seed, rounds=8){
+  rounds = Math.max(MIN_SEASONS, Math.min(MAX_SEASONS, rounds|0));
+  const rng = mulberry(hash(seed+'|deal'));
+  const n = plist.length, npc = 12 + 4*n, pop0 = 6*n + npc;
+  const used = new Set(), events = [];
+  for(let r=1;r<=rounds;r++){
+    const y = yearAt(r, rounds);
+    let ok = EVENTS.filter(e=>!used.has(e.id) && e.y0<=y && e.y1>=y);
+    if(!ok.length) ok = EVENTS.filter(e=>e.y0<=y && e.y1>=y);
+    const e = ok[Math.floor(rng()*ok.length)]; used.add(e.id); events.push(e.id);
+  }
+  const players = {};
+  plist.forEach(p=>{players[p.id]={id:p.id,name:p.name,family:6,savings:2,comfort:0,virtue:0,deaths:0,emigrants:0}; dealHands(players[p.id], rng)});
+  return {v:4, seed, round:1, maxRounds:rounds, npc, food:r1(pop0*1.3), growth:r1(pop0*.10), improvements:0,
+    lastWage:1.3, poorRate:0, cornLaw:false, reliefCap:3, unionRisk:.35,
+    order:plist.map(p=>p.id), players, events, quiz:shuffle(QUIZ.map((_,i)=>i),rng).slice(0,rounds),
+    history:[{year:1793,pop:pop0,food:r1(pop0*1.3),wage:1.3}], report:null, over:false};
+}
+
+function score(p){return Math.round(p.family + p.emigrants + p.savings + p.comfort - 2*p.deaths)}
+
+function resolveRound(prev, moves){
+  const s = JSON.parse(JSON.stringify(prev));
+  const rng = mulberry(hash(s.seed+'|round'+s.round));
+  const ev = EVENTS.find(e=>e.id===s.events[s.round-1]);
+  const q = QUIZ[s.quiz[s.round-1]];
+  const lines = {};
+  const add = (id,label,value,k='neutral')=>(lines[id]=lines[id]||[]).push({l:label,v:value,k});
+  const start = {}; s.order.forEach(id=>{const p=s.players[id]; start[id]={family:p.family,legacy:score(p),deaths:p.deaths}});
+  const M = {};
+  for(const id of s.order){
+    const m = moves[id]||{}, p = s.players[id], fh = p.famHand;
+    const fam = FAMILY[m.family] && (!fh || fh.includes(m.family)) ? m.family : (!fh || fh.includes('late') ? 'late' : fh[0]);
+    const act = ACTIONS[m.action] && p.hand.includes(m.action) && affordable(m.action, p) ? m.action : null;
+    M[id] = {family:fam, action:act, quiz:m.quiz};
+  }
+  const mv = id => M[id];
+
+  // persistent event effects
+  if(ev.growth) s.growth = r1(s.growth + ev.growth);
+  if(ev.cornLaw) s.cornLaw = true;
+  if(ev.reliefCap) s.reliefCap = Math.max(1, s.reliefCap + ev.reliefCap);
+  if(ev.unionRisk) s.unionRisk = ev.unionRisk;
+  if(s.round>1) s.food = r1(s.food + s.growth);
+
+  // 1. births respond to last season's wage
+  const fert = s.lastWage >= 1 ? 1 : .5;
+  let births = 0;
+  for(const id of s.order){
+    const p = s.players[id], m = mv(id), f = FAMILY[m.family];
+    const rate = birthRate(m.family, s);
+    const b = Math.round(p.family * rate * fert);
+    p.family += b; births += b; p.virtue += f.virtue;
+    add(id, f.title, b ? `+${b} born${fert<1?' (hunger halved births)':''}` : (m.family==='boom'?'times too hard, no births':'no births'), b?'up':'neutral');
+    if(m.family==='service' && p.family>2){p.family--;p.emigrants++;add(id,'Into service','1 child left home to work','up')}
+    if(m.family==='love'){p.comfort=r1(p.comfort+1);add(id,'Marry for Love','+1 comfort','up')}
+    if(m.family==='celibate'){p.savings=r1(p.savings+1);add(id,'Stay Single','+1 savings','up')}
+    if(m.family==='elder'){p.family++;p.comfort=r1(p.comfort+2);add(id,'Aging parent','moved in: +1 mouth','down');add(id,'Aging parent','+2 comfort','up')}
+    if(m.family==='feast'){p.comfort=r1(p.comfort+2);add(id,'Wedding feast','+2 comfort','up');if(p.savings>=1){p.savings=r1(p.savings-1);add(id,'Wedding feast','−1 savings','down')}}
+  }
+  const npcRate = s.lastWage>=1.2?.30:s.lastWage>=1.05?.18:s.lastWage>=.95?.06:0;
+  const npcBirths = Math.round(s.npc*npcRate); s.npc += npcBirths;
+
+  // 2. pre-harvest actions
+  for(const id of s.order){
+    const p = s.players[id], m = mv(id);
+    if(m.action==='emigrate'){
+      if(p.savings>=2 && p.family>2){p.savings=r1(p.savings-2);p.family-=2;p.emigrants+=2;add(id,'Emigration','2 relatives sailed for America (−2 savings)','up')}
+      else add(id,'Emigration','couldn’t afford passage (needs 2 savings)','down');
+    }
+    if(m.action==='improve'){
+      if(p.savings>=3){const g=IMPROVE_GAINS[Math.min(s.improvements,7)];p.savings=r1(p.savings-3);s.improvements++;s.growth=r1(s.growth+g);add(id,'Improved the land',`harvest +${g} a season for all (−3 savings)`,'up')}
+      else add(id,'Improve the land','couldn’t afford it (needs 3 savings)','down');
+    }
+    if(m.action==='petition'){
+      if(!s.cornLaw) add(id,'Petition','no Corn Law to repeal yet','neutral');
+      else if(rng()<.35){s.cornLaw=false;add(id,'Petition','Parliament repealed the Corn Law!','up')}
+      else add(id,'Petition','Parliament ignored it','neutral');
+    }
+    if(m.action==='godwin'){p.comfort=r1(p.comfort+2);p.virtue-=2;add(id,'Read Godwin','+2 comfort','up')}
+    if(m.action==='machines'){
+      p.comfort=r1(p.comfort+2);p.virtue-=2;add(id,'Broke the machines','+2 comfort','up');
+      if(rng()<s.unionRisk && p.family>1){p.family--;p.deaths++;add(id,'Frame-breaking trial','a relative was hanged or transported','down')}
+    }
+    if(m.action==='allotment'){p.savings=r1(p.savings-1);add(id,'Allotment rent','−1 savings','down')}
+  }
+  if(ev.kill){
+    for(const id of s.order){const p=s.players[id];const d=Math.min(Math.floor(p.family*ev.kill),p.family-1);if(d){p.family-=d;p.deaths+=d;add(id,ev.title,`${d} died`,'down')}}
+    s.npc = r1(s.npc*(1-ev.kill));
+  }
+  if(ev.addPeople) for(const id of s.order){s.players[id].family+=ev.addPeople;add(id,ev.title,`+${ev.addPeople} child survived`,'up')}
+  if(ev.npcGrow) s.npc = r1(s.npc*(1+ev.npcGrow));
+  if(ev.savingsGain) for(const id of s.order){const p=s.players[id];p.savings=r1(p.savings+ev.savingsGain);add(id,ev.title,`+${ev.savingsGain} savings`,'up')}
+  if(ev.savingsLoss) for(const id of s.order){const p=s.players[id];const l=r1(p.savings*ev.savingsLoss);if(l>0){p.savings=r1(p.savings-l);add(id,ev.title,`−${l} savings`,'down')}}
+
+  // 3. the harvest and the wage
+  const pop = s.order.reduce((a,id)=>a+s.players[id].family,0) + s.npc;
+  const harvest = s.food * ev.mult * (s.cornLaw ? .9 : 1);
+  const avail = Math.max(0, harvest - s.poorRate);
+  const wage = avail / pop;
+  let reliefPaid = 0, deaths = 0;
+
+  for(const id of s.order){
+    const p = s.players[id], m = mv(id);
+    let rate = wage, extra = 0;
+    if(m.action==='union'){
+      if(rng() < s.unionRisk){
+        if(p.savings>=3){p.savings=r1(p.savings-3);add(id,'Combination Act','prosecuted, fined 3 savings','down')}
+        else if(p.family>1){p.family--;p.deaths++;add(id,'Combination Act','prosecuted, a relative transported','down')}
+      } else {rate *= 1.25; add(id,'Combination','held firm: wages ×1.25','up')}
+    }
+    if(m.action==='mill'){
+      extra += p.family*.25*(ev.millBoost?2:1);
+      add(id,'Mill wages',`+${r1(p.family*.25*(ev.millBoost?2:1))} loaves`,'up');
+      if(rng() < .3 && p.family>1){p.family--;p.deaths++;add(id,'Mill accident','a child was lost','down')}
+    }
+    if(m.action==='glean'){extra += 2; add(id,'Gleaning','+2 loaves','up')}
+    if(m.family==='lodgers'){extra += 1.5; add(id,'Lodgers’ rent','+1.5 loaves','up')}
+    if(m.family==='loom'){const g=r1(p.family*.15);extra += g; add(id,'Loom work',`+${g} loaves`,'up')}
+    if(m.action==='manchester'){
+      extra += 2.5; add(id,'Work in Manchester','+2.5 loaves','up');
+      if(rng()<.2 && p.family>1){p.family--;p.deaths++;add(id,'Fever in the slums','a relative died','down')}
+    }
+    if(m.action==='allotment'){const g=r1(p.family*.4);extra += g; add(id,'Allotment',`+${g} loaves`,'up')}
+    if(m.action==='poach'){
+      if(rng()<.3){
+        if(p.savings>=3){p.savings=r1(p.savings-3);add(id,'Caught poaching','fined 3 savings','down')}
+        else if(p.family>1){p.family--;p.deaths++;add(id,'Caught poaching','a relative was transported','down')}
+      } else {extra += 3; add(id,'Poaching','+3 loaves','up')}
+    }
+    const income = p.family*rate + extra, need = p.family;
+    const net = income - need;
+    if(m.quiz === q.a){p.savings=r1(p.savings+1);add(id,'Question','correct: +1 savings','up')}
+    else add(id,'Question', m.quiz==null?'not answered, no reward':'wrong answer, no reward','down');
+    if(ev.comfort){p.comfort=r1(p.comfort+ev.comfort);add(id,ev.title,`${ev.comfort>0?'+':'−'}${Math.abs(ev.comfort)} comfort`,ev.comfort>0?'up':'down')}
+    if(net >= 0){
+      if(m.family==='tavern'){p.comfort=r1(p.comfort+net*1.5);add(id,'Ale-house',`surplus of ${r1(net)} drunk: +${r1(net*1.5)} comfort`,'up')}
+      else if(net>=.05){const g=r1(net*(m.family==='thrift'?1.25:1));p.savings=r1(p.savings+g);add(id,m.family==='thrift'?'Frugal surplus':'Surplus',`+${g} savings`,'up')}
+      else add(id,'Harvest','just enough to eat','neutral');
+    } else {
+      let short = -net;
+      add(id,'Harvest',`short ${r1(short)} loaves`,'down');
+      const use = Math.min(p.savings, short); p.savings = r1(p.savings-use); short -= use;
+      if(use>0) add(id,'Savings',`−${r1(use)} spent to eat`,'down');
+      if(short>0 && m.action==='charity'){const cov=Math.min(short,2);short-=cov;add(id,'Private charity',`covered ${r1(cov)} loaves`,'up')}
+      if(short>0 && m.family==='parish'){const cov=Math.min(short,2);short-=cov;reliefPaid+=cov;add(id,'Parish support',`covered ${r1(cov)} loaves`,'up')}
+      if(short>0 && m.action==='relief'){const cov=Math.min(short,s.reliefCap);short-=cov;reliefPaid+=cov;add(id,'Poor relief',`covered ${r1(cov)} loaves`,'up')}
+      if(short>0 && m.action==='workhouse'){reliefPaid+=short;add(id,'Workhouse',`covered ${r1(short)} loaves`,'up');short=0;p.comfort=r1(p.comfort-2);p.virtue-=1;add(id,'Workhouse','−2 comfort','down')}
+      const d = Math.min(Math.ceil(short*1.5 - 1e-9), p.family-1);
+      if(d>0){p.family-=d;p.deaths+=d;deaths+=d;add(id,'Want and sickness',`${d} died`,'down')}
+    }
+    if(m.action==='workhouse' && net>=0) add(id,'Workhouse','not needed this season','neutral');
+    if(m.action==='relief' && net>=0) add(id,'Poor relief','not needed this season','neutral');
+    if(m.action==='charity' && net>=0) add(id,'Private charity','not needed this season','neutral');
+    if(m.action==='friendly'){const g=r1(Math.min(3,Math.max(1,p.savings*.2)));p.savings=r1(p.savings+g);p.virtue+=1;add(id,'Friendly Society',`+${g} savings`,'up')}
+  }
+  for(const id of s.order) dealHands(s.players[id], rng);
+  let npcDeaths = 0;
+  if(wage < 1){npcDeaths = Math.round(s.npc*(1-wage)); s.npc = Math.max(4, s.npc-npcDeaths)}
+  s.npc = Math.round(s.npc);
+  s.poorRate = r1(reliefPaid);
+
+  const popAfter = s.order.reduce((a,id)=>a+s.players[id].family,0) + s.npc;
+  const picks = {}; s.order.forEach(id=>{const k=mv(id).family; picks[k]=(picks[k]||0)+1});
+  const lost = s.order.reduce((a,id)=>a+s.players[id].deaths-start[id].deaths,0);
+  s.history.push({year:yearOf(s.round,s), pop:popAfter, food:r1(avail), wage:Math.round(wage*100)/100,
+    ev:ev.id, births, lost, npcB:npcBirths, npcD:npcDeaths, relief:r1(reliefPaid), picks});
+
+  let insight;
+  if(wage < .95) insight = `The real wage fell to ${wage.toFixed(2)} loaves a head, below subsistence. The positive check is at work: population is being forced back down to the food supply. This is the trough of Malthus’s wage cycle.`;
+  else if(wage < 1.05) insight = `The wage sits at subsistence (${wage.toFixed(2)}). This is where Malthus says wages always return: births and food are barely balanced.`;
+  else insight = `The wage is above subsistence (${wage.toFixed(2)}). Malthus predicts that comfort encourages marriages and births, so watch the parish population surge next season and pull the wage back down.`;
+  if(reliefPaid>0) insight += ` Parish relief paid out ${r1(reliefPaid)} loaves, which comes off next season’s food as the poor rate: Malthus’s first objection to the Poor Laws.`;
+
+  s.report = {round:s.round, year:yearOf(s.round,s), event:ev.id, wage:Math.round(wage*100)/100, pop, avail:r1(avail),
+    births, deaths, npcBirths, npcDeaths, reliefPaid:r1(reliefPaid), lines, insight, quiz:s.quiz[s.round-1], start,
+    answers:Object.fromEntries(s.order.map(id=>[id, moves[id]?.quiz ?? null])),
+    chose:Object.fromEntries(s.order.map(id=>[id, {family:mv(id).family, action:mv(id).action}]))};
+  s.lastWage = wage;
+  s.round++;
+  if(s.round > s.maxRounds) s.over = true;
+  return s;
+}
+
+/* =========================================================
+   APP STATE
+   ========================================================= */
+const $app = document.getElementById('app'), $layer = document.getElementById('layer'), $pop = document.getElementById('popwrap');
+const esc = t => String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+let view = 'home';
+let caps = {db:null, user:null, uid:null, tried:false};
+let local = null;           // {state, moves, turn, curtain}
+let online = {code:null, room:null, moves:{}, unsubs:[], resolving:0, rooms:[], roomsUnsub:null, error:''};
+let sel = {key:'', family:null, action:null, actionIdx:null, quiz:null};
+let seen = store.get('gl-seen', {});
+let overlay = null;         // 'guide' | 'report' | 'tutorial' | null
+let tut = {step:0, next:null};
+let hintsOn = store.get('gl-hints', true);
+let seasonsPick = store.get('gl-seasons', 8);
+
+(async function initCaps(){
+  try{
+    if(window.claude && claude.use){
+      const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+      caps.db = db; caps.user = user;
+      if(user) caps.uid = await user.id();
+    }
+  }catch(e){}
+  caps.tried = true;
+  if(view==='home' || view==='lobby') render();
+})();
+
+/* =========================================================
+   RENDER HELPERS
+   ========================================================= */
+const hint = id => hintsOn ? `<button class="bulb" data-hint="${id}" aria-label="Hint: ${esc(HINTS[id][0])}">${BULB}</button>` : '';
+
+function familyCard(k, o={}){
+  const f = FAMILY[k], s = o.state;
+  const tag = o.tag || 'button';
+  const style = (o.style||'') + (o.d!=null?`--d:${o.d}ms;`:'');
+  return `<${tag} class="card family${o.selected?' sel':''}${o.dim?' dim':''} ${o.cls||''}" ${tag==='button'?`data-fam="${k}" aria-pressed="${!!o.selected}"`:''} ${style?`style="${style}"`:''}>
+    <div class="kind"><span>Household</span><span>Choice</span></div>
+    <div class="ttl">${f.title}</div><div class="ico">${ICONS[k]}</div>
+    <div class="fx">${f.fx(s)}</div><div class="qt">${f.quote}</div></${tag}>`;
+}
+const DEFAULT_S = {reliefCap:3, unionRisk:.35, improvements:0, cornLaw:false, lastWage:1.3};
+function actionCard(k, o={}){
+  const a = ACTIONS[k], s = o.state || DEFAULT_S, p = o.player;
+  const ok = affordable(k, p);
+  const tag = o.tag || 'button';
+  return `<${tag} class="card action${o.selected?' sel':''}${ok?'':' locked'} ${o.cls||''}" ${o.d!=null?`style="--d:${o.d}ms"`:''} ${tag==='button'?`data-act-card="${k}" data-idx="${o.idx}" aria-pressed="${!!o.selected}" ${ok?'':'disabled aria-disabled="true"'}`:''}>
+    <div class="kind"><span>Parish</span><span>Action</span></div>
+    <div class="ttl">${a.title}</div><div class="ico">${ICONS[k]}</div>
+    <div class="fx">${a.fx(s)}</div><div class="qt">${a.quote}</div>
+    ${ok?'':`<div class="lockmsg">${esc(lockReason(k,p))}</div>`}</${tag}>`;
+}
+const animated = new Set();
+function once(k){ if(animated.has(k)) return false; animated.add(k); return true; }
+function eventCard(id, cls=''){
+  const e = EVENTS.find(x=>x.id===id);
+  return `<div class="card event ${cls}"><div class="kind"><span>Event</span><span>Season</span></div>
+    <div class="ttl">${e.title}</div><div class="fx">${e.fx}</div><div class="qt">${esc(e.m)}</div></div>`;
+}
+function people(p){
+  const max = 36; let h = '';
+  for(let i=0;i<Math.min(p.family,max);i++) h += '<span class="person" title="living"></span>';
+  if(p.family>max) h += `<span class="num" style="font-size:11px;color:var(--text-dim)">+${p.family-max}</span>`;
+  for(let i=0;i<Math.min(p.emigrants,10);i++) h += '<span class="person gone" title="emigrated"></span>';
+  for(let i=0;i<Math.min(p.deaths,16);i++) h += '<span class="person lost" title="lost"></span>';
+  return h;
+}
+
+function chartSVG(hist, which){
+  const W=320,H=170,L=34,R=10,T=12,B=24;
+  const xs = i => L + (W-L-R) * (hist.length<2 ? 0 : i/(Math.max(hist.length-1,1)));
+  let series, maxY, minY=0, lines='', grid='';
+  if(which==='pf'){
+    maxY = Math.max(...hist.map(h=>Math.max(h.pop,h.food)))*1.1;
+    series = [{k:'pop',c:'var(--madder)'},{k:'food',c:'var(--wheat)'}];
+  } else {
+    maxY = Math.max(1.6, ...hist.map(h=>h.wage)); minY = Math.min(.5, ...hist.map(h=>h.wage));
+    series = [{k:'wage',c:'var(--indigo)'}];
+  }
+  const ys = v => T + (H-T-B) * (1 - (v-minY)/(maxY-minY));
+  const ticks = which==='pf' ? [0, Math.round(maxY/2), Math.round(maxY)] : [minY, 1, maxY].map(v=>Math.round(v*100)/100);
+  for(const t of ticks){grid += `<line x1="${L}" x2="${W-R}" y1="${ys(t)}" y2="${ys(t)}" stroke="var(--felt-line)" stroke-width="1"/><text x="${L-6}" y="${ys(t)+3}" text-anchor="end">${t}</text>`}
+  if(which==='w') grid += `<line x1="${L}" x2="${W-R}" y1="${ys(1)}" y2="${ys(1)}" stroke="var(--paper)" stroke-dasharray="4 4" stroke-width="1.2"/><text x="${W-R}" y="${ys(1)-5}" text-anchor="end" style="fill:var(--paper)">subsistence</text>`;
+  for(const s of series){
+    const pts = hist.map((h,i)=>`${xs(i).toFixed(1)},${ys(h[s.k]).toFixed(1)}`).join(' ');
+    if(which==='w') lines += `<polygon points="${xs(0)},${ys(minY)} ${pts} ${xs(hist.length-1)},${ys(minY)}" fill="var(--indigo)" opacity=".12"/>`;
+    lines += `<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="2.4" stroke-linejoin="round"/>`;
+    const last = hist[hist.length-1];
+    lines += `<circle cx="${xs(hist.length-1)}" cy="${ys(last[s.k])}" r="4" fill="${s.c}"/>`;
+  }
+  const xl = hist.map((h,i)=> (i===0||i===hist.length-1||hist.length<6) ? `<text x="${xs(i)}" y="${H-6}" text-anchor="middle">${h.year}</text>` : '').join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${which==='pf'?'Population versus food':'Real wage over time'}">${grid}${lines}${xl}</svg>`;
+}
+
+/* =========================================================
+   SCREENS
+   ========================================================= */
+function render(){
+  closePop();
+  if(view==='home') renderHome();
+  else if(view==='setup') renderSetup();
+  else if(view==='lobby') renderLobby();
+  else if(view==='notes') renderNotes();
+  else if(view==='catalog') renderCatalog();
+  else if(view==='practice') renderPractice();
+  else if(view==='local'){
+    const st = local.state, chip = '<span class="chip">Pass-and-play</span>';
+    if(local.phase==='turns' && !st.over){ const me = st.order[local.turn]; local.curtain ? curtainScreen(st, me, chip) : turnScreen(st, me, chip); }
+    else renderGame(st, localCtx());
+  }
+  else if(view==='room') renderRoom();
+  renderLayer();
+}
+
+function topbar(extra=''){
+  return `<div class="topbar"><button class="wordmark" data-go="home">The Great Lottery</button>
+  <div class="right">${extra}
+    <button class="toggle" data-do="toggle-hints" aria-pressed="${hintsOn}"><span class="sw"></span>Hints ${hintsOn?'on':'off'}</button>
+    <button class="btn ghost small" data-do="open-tutorial">How to play</button>
+    <button class="btn ghost small" data-open="guide">Field guide</button>
+    ${view==='notes'||view==='local'||view==='room'?'':'<button class="btn ghost small" data-go="notes">Study notes</button>'}</div></div>`;
+}
+
+function renderHome(){
+  const fan = [['f','early'],['a','relief'],['f','late'],['f','tavern']];
+  const fanCards = fan.map(([t,k],i)=>{const a=(i-1.5)*13, y=Math.abs(i-1.5)*12;
+    const st=`transform:translateX(-50%) rotate(${a}deg) translateY(${y}px);--a:${a}deg;--y:${y}px;--i:${i}`;
+    return t==='f'?familyCard(k,{tag:'div',style:st}):`<div style="${st}" class="fanwrap">${actionCard(k,{tag:'div'})}</div>`}).join('');
+  const onlineOk = caps.db && caps.uid;
+  let saved = local && !local.state.over ? local : null;
+  if(!saved){ const s = store.get('gl-local-save', null); if(s && s.state && s.state.v===4 && !s.state.over) saved = s; }
+  const resume = saved ? `<button class="resume" data-do="continue"><span class="dot"></span>Continue your game · season ${saved.state.round} of ${saved.state.maxRounds}, ${yearOf(saved.state.round, saved.state)} · ${saved.state.order.map(id=>esc(saved.state.players[id].name)).join(', ')}</button>` : '';
+  const ico = {
+    notes:'<svg viewBox="0 0 40 40"><path d="M10 6h16l6 6v22H10z"/><path d="M26 6v6h6M15 18h12M15 23h12M15 28h8"/></svg>',
+    cat:'<svg viewBox="0 0 40 40"><rect x="6" y="10" width="14" height="20" rx="2"/><rect x="13" y="7" width="14" height="20" rx="2"/><rect x="20" y="10" width="14" height="20" rx="2"/></svg>',
+    quiz:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13"/><path d="M15.5 16a4.5 4.5 0 1 1 6 4.2c-1 .4-1.5 1.2-1.5 2.3v1"/><circle cx="20" cy="28" r=".8"/></svg>'
+  };
+  $app.innerHTML = `${topbar()}
+  <section class="hero2">
+    <div class="hero-copy">
+      <div class="eyebrow">A card game of population &amp; wages · England, 1798–1833</div>
+      <h1>The Great Lottery<em>a parish run on Malthus’s laws</em></h1>
+      <blockquote class="namequote"><p>“These are the unhappy persons who, in the great lottery of life, have drawn a blank.”</p>
+        <footer>T. R. Malthus, <i>An Essay on the Principle of Population</i>, 1798 · the line that names this game</footer></blockquote>
+      <p class="lede">Run a laboring family through the Industrial Revolution. Marry young or wait, save or drink, strike or emigrate. The harvest only grows by steps, and every season the wage is <b>food ÷ mouths</b>.</p>
+      <div class="play">
+        <button class="bigplay primary" data-tut="setup"><span class="t">Play on one screen</span><span class="s">1–6 players · pass the device</span></button>
+        <button class="bigplay" data-tut="lobby" ${onlineOk?'':'disabled'}><span class="t">Play online</span><span class="s">${onlineOk?'2–6 players · separate devices':caps.tried?'Needs claude.ai sign-in':'Connecting…'}</span></button>
+      </div>
+      ${resume}
+      <div class="facts"><span><b>3–12</b> seasons</span><span><b>${Object.keys(FAMILY).length+Object.keys(ACTIONS).length}</b> cards</span><span><b>${EVENTS.length}</b> events</span><span><b>${QUIZ.length}</b> questions</span></div>
+    </div>
+    <div class="fan table" aria-hidden="true">${fanCards}</div>
+  </section>
+
+  <section class="season-strip" aria-label="How a season plays">
+    <div class="eyebrow">How a season plays</div>
+    <ol>
+      <li><b>Draw your hand</b><span>3 household cards and 3 parish actions, dealt fresh each season.</span></li>
+      <li><b>Choose &amp; lock in</b><span>Pick how your family marries, play an action, and answer the question.</span></li>
+      <li><b>The harvest</b><span>Wage = food ÷ mouths. Above 1 you save; below 1, hunger takes its toll.</span></li>
+      <li><b>Read the ledger</b><span>See what happened, then hear Malthus explain it and Hunt reply.</span></li>
+    </ol>
+  </section>
+
+  <section class="study">
+    <div class="study-head"><h2>Study &amp; practice</h2><p>For before or after a game: the theory behind the cards.</p></div>
+    <div class="study-grid">
+      <div class="tile learn-tile"><h3>What you’ll learn</h3><ul>
+        <li>Geometric vs. arithmetic growth</li><li>Preventive &amp; positive checks</li><li>Why wages drift to subsistence</li><li>Malthus on relief and redistribution</li><li>Hunt’s critique of the theory</li></ul></div>
+      <button class="tile link-tile" data-go="notes"><span class="ti">${ico.notes}</span><h3>Study notes</h3><p>The full chapter summary, section by section.</p><span class="go">Read →</span></button>
+      <button class="tile link-tile" data-go="catalog"><span class="ti">${ico.cat}</span><h3>Card Catalog</h3><p>Every card, event and question, with answers.</p><span class="go">Browse →</span></button>
+      <button class="tile link-tile" data-go="practice"><span class="ti">${ico.quiz}</span><h3>Examination Hall</h3><p>Quiz yourself on all ${QUIZ.length} questions.</p><span class="go">Start →</span></button>
+    </div>
+  </section>`;
+}
+
+function renderNotes(){
+  const pop=[1,2,4,8,16,32,64,128,256], food=[1,2,3,4,5,6,7,8,9];
+  const secs = ['The big idea','Why he wrote it','The core model','The checks','Theory of wages','Policy conclusions','Hunt’s critique','Legacy','Cheat sheet','Test yourself'];
+  $app.innerHTML = `${topbar()}
+  <div class="notes-wrap">
+  <aside class="outline" aria-label="Study notes outline"><div class="eyebrow">Outline</div>
+    <nav>${secs.map((s,i)=>`<button class="sec${i===0?' on':''}" data-sec="n${i+1}"><span>${i+1}</span>${s}</button>`).join('')}</nav>
+    <button class="btn small back" data-go="home">Back to the game</button></aside>
+  <div class="notes"><div class="sheet">
+    <div class="eyebrow">Study notes · Hunt &amp; Lautzenheiser, <i>History of Economic Thought</i> (2011), Ch. 4</div>
+    <h2 style="font-size:40px;margin-top:8px">Malthus on Population and Wages</h2>
+    <p style="color:var(--ink-soft);font-size:14px">Mostly from “The Theory of Population” (pp. 71–78), with background on wages from pp. 65–71 and Malthus’s later argument about wages from pp. 87–88.</p>
+    <p class="callout"><b>Heads up:</b> Hunt is a <i>critical</i> (Marxian-leaning) historian. The book explains what Malthus said and also argues that his theory defended the wealthy. Keep <b>(a) Malthus’s theory</b> separate from <b>(b) Hunt’s critique of it</b>. Exam questions often ask for one or the other.</p>
+
+    <h2 id="n1">1. The big idea in one sentence</h2>
+    <p class="big">Population tends to grow faster than the food supply. So something (late marriage, vice, or misery) must keep holding population down, and most people’s wages get pushed back toward bare subsistence.</p>
+
+    <h2 id="n2">2. Why Malthus wrote it</h2>
+    <ul>
+      <li><b>Who:</b> Thomas Robert Malthus (1766–1834). He held Britain’s first professorship of political economy, at the East India Company’s college.</li>
+      <li><b>When:</b> The Industrial Revolution. Workers lived near subsistence and real wages fell in the late 1700s. There were child labor, 14–18 hour days, slums, riots, early unions and the Luddites.</li>
+      <li><b>Against whom:</b> Radical reformers who blamed poverty on <i>institutions</i>, not nature. <b>Condorcet</b> wanted a welfare fund and credit for workers. <b>William Godwin</b> blamed private property and a government run by the rich.</li>
+      <li><b>His book:</b> <i>An Essay on the Principle of Population</i> (1798). A heavily revised second edition followed in 1803.</li>
+    </ul>
+    <p>Malthus’s reply: even a perfect, equal society would soon split back into <b>proprietors and laborers</b> because of the “inevitable laws of nature.”</p>
+
+    <h2 id="n3">3. The core model: geometric vs. arithmetic</h2>
+    <div class="tw"><table><thead><tr><th></th><th>Growth pattern</th><th>Malthus’s claim</th></tr></thead><tbody>
+      <tr><td><b>Population</b></td><td>Geometric (1, 2, 4, 8…)</td><td>Unchecked, it doubles about every 25 years.</td></tr>
+      <tr><td><b>Food supply</b></td><td>Arithmetic (1, 2, 3, 4…)</td><td>On limited land, each generation adds at most the same fixed amount, and realistically less (diminishing returns).</td></tr>
+    </tbody></table></div>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:12px">Illustration (a standard classroom example, not in Hunt’s text):</p>
+    <div class="tw"><table><thead><tr><th>Years</th>${pop.map((_,i)=>`<th style="text-align:right">${i*25}</th>`).join('')}</tr></thead><tbody>
+      <tr><td><b>Population</b></td>${pop.map(v=>`<td class="n">${v}</td>`).join('')}</tr>
+      <tr><td><b>Food</b></td>${food.map(v=>`<td class="n">${v}</td>`).join('')}</tr></tbody></table></div>
+    <p>The gap grows without limit, but real populations never actually grow like this. So Malthus’s real question was: <b>what forces check population?</b></p>
+
+    <h2 id="n4">4. The checks on population</h2>
+    <h3>By what they do</h3>
+    <div class="tw"><table><thead><tr><th>Type</th><th>Works through</th><th>Examples</th></tr></thead><tbody>
+      <tr><td><b>Preventive</b></td><td>Fewer <b>births</b></td><td>Sterility, sexual abstinence, birth control</td></tr>
+      <tr><td><b>Positive</b></td><td>More <b>deaths</b></td><td>Famine, misery, plague, war, and finally starvation</td></tr></tbody></table></div>
+    <p>If preventive checks aren’t strong enough, positive checks take over. If disease and war aren’t enough, starvation does the job.</p>
+    <h3>By morals: “moral restraint, vice and misery”</h3>
+    <ul><li><b>Moral restraint:</b> delaying marriage without sex outside it. Malthus thought only the virtuous (in practice, the better-off) practiced it.</li>
+      <li><b>Vice:</b> includes birth control, which he condemned.</li>
+      <li><b>Misery:</b> hunger, disease, early death.</li></ul>
+    <p class="callout"><b>Why it matters (Hunt):</b> this turns the theory into a <i>moral</i> story. The rich are rich because they are restrained, and the poor are poor because they aren’t. Malthus said the poor spend any surplus at the “ale-house.”</p>
+
+    <h2 id="n5">5. How this becomes a theory of wages</h2>
+    <div class="flow">Wages rise above subsistence<br>↓ workers marry earlier and have more children<br>↓ population and the labor supply grow<br>↓ more workers competing, more mouths, limited food<br>↓ wages fall back to <b>subsistence</b> (sometimes below → positive checks)<br>↓ population growth slows until wages recover… and the cycle repeats</div>
+    <p>In the long run, wages tend toward the <b>subsistence level</b>: just enough to survive and replace the workforce. Later economists called this the <b>subsistence theory of wages</b> or the <b>“iron law of wages.”</b> Hunt doesn’t use those labels, but it’s the mechanism the theory implies.</p>
+    <h3>The “18 pence to 5 shillings” example</h3>
+    <p>Malthus imagined the rich raising laborers’ pay from 18 pence a day to 5 shillings. He argued workers would feel rich, <b>work less</b>, and give a “check to productive industry,” so the nation and the workers would both end up <i>worse off</i>. Raising wages fails twice: in the short run through less effort, and in the long run through more population.</p>
+
+    <h2 id="n6">6. Malthus’s policy conclusions</h2>
+    <ol><li><b>Against redistribution:</b> it just creates more poor people who fall back to subsistence.</li>
+      <li><b>Against the Poor Laws:</b> they increase population <i>without</i> increasing food, and give food to people in workhouses instead of “more industrious and more worthy” members. This fed campaigns against the Speenhamland system (1795).</li>
+      <li><b>Poverty is inevitable:</b> some people “in the great lottery of life, have drawn a blank.”</li>
+      <li><b>Property and inequality are necessary:</b> he credited private property and “self-love” with every achievement of civilization.</li>
+      <li><b>The extreme passage:</b> taken to its logical end, he wrote, society should stop fighting mortality: narrower streets, crowded housing, and no cures for specific diseases.</li>
+      <li>He closed the first Essay by appealing to God: suffering is a necessary ingredient in a process that produces far more happiness.</li></ol>
+
+    <h2 id="n7">7. Hunt’s critique</h2>
+    <ul><li>The theory was a <b>defense of the wealthy</b> against reformers like Godwin and Condorcet.</li>
+      <li>It <b>blames the poor</b> for poverty instead of the class structure, low wages, or the Combination Acts that outlawed unions.</li>
+      <li>Its lasting message, in Hunt’s words: poverty is inevitable, “little or nothing can be done about it,” and it is due to the poor’s own weakness.</li>
+      <li><b>Inconsistency:</b> in his <i>Principles of Political Economy</i> (1820) and theory of gluts, Malthus mostly dropped the population argument. He opposed higher wages because they <b>lower profits</b> and weaken the motive to accumulate. Hunt says this reflects class loyalty more than logic.</li></ul>
+
+    <h2 id="n8">8. Legacy</h2>
+    <ul><li>The theory <b>inspired Charles Darwin’s</b> natural selection.</li><li>Versions of it are still used in debates about less-developed countries.</li></ul>
+    <h3>Critiques from outside the chapter (useful for essays)</h3>
+    <ul><li><b>Technology:</b> farm productivity grew far faster than “arithmetic.”</li><li><b>Demographic transition:</b> as countries get richer, birth rates usually fall.</li><li><b>Real wages</b> in industrial countries rose far above subsistence.</li></ul>
+
+    <h2 id="n9">9. Cheat sheet</h2>
+    <div class="tw"><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody>
+      <tr><td>Geometric progression</td><td>Population doubling (1, 2, 4, 8…), about every 25 years unchecked</td></tr>
+      <tr><td>Arithmetic progression</td><td>Food growing by a constant amount at most (1, 2, 3, 4…)</td></tr>
+      <tr><td>Preventive check</td><td>Lowers the birth rate</td></tr>
+      <tr><td>Positive check</td><td>Raises the death rate</td></tr>
+      <tr><td>Moral restraint</td><td>Delaying marriage without sex outside it</td></tr>
+      <tr><td>Subsistence wage</td><td>The wage level population pressure pushes workers back to</td></tr>
+      <tr><td>Poor Laws / Speenhamland</td><td>Welfare Malthus opposed as raising population without raising food</td></tr>
+      <tr><td>Godwin &amp; Condorcet</td><td>The reformers the 1798 Essay attacked</td></tr>
+      <tr><td>Theory of gluts</td><td>His later theory; there he opposed higher wages because they cut profits</td></tr></tbody></table></div>
+
+    <h2 id="n10">10. Test yourself</h2>
+    <ol><li>Why does geometric vs. arithmetic growth guarantee a problem in Malthus’s view?</li>
+      <li>Name two preventive checks and two positive checks.</li>
+      <li>Walk through how a wage increase ends up back at subsistence.</li>
+      <li>What did Malthus predict if pay rose from 18 pence to 5 shillings, and why?</li>
+      <li>Give Malthus’s two objections to the Poor Laws.</li>
+      <li>How does “moral restraint, vice and misery” support Hunt’s claim that the theory blames the poor?</li>
+      <li>In the <i>Principles</i>, what new reason did Malthus give for opposing higher wages?</li>
+      <li>Name one real-world development that contradicts Malthus’s predictions.</li></ol>
+    <div class="actions"><button class="btn ghost" data-go="home">Back to the game</button><button class="btn" data-tut="setup">Play pass-and-play</button></div>
+  </div></div></div>`;
+  watchNotes();
+}
+function renderCatalog(){
+  const S = {...DEFAULT_S, cornLaw:true};
+  const fams = Object.keys(FAMILY), acts = Object.keys(ACTIONS);
+  const secs = [['c1',`Household cards (${fams.length})`],['c2',`Parish action cards (${acts.length})`],['c3',`Events (${EVENTS.length})`],['c4',`Questions (${QUIZ.length})`]];
+  $app.innerHTML = `${topbar()}
+  <div class="notes-wrap">
+  <aside class="outline" aria-label="Catalog outline"><div class="eyebrow">Catalog</div>
+    <nav>${secs.map((s,i)=>`<button class="sec${i===0?' on':''}" data-sec="${s[0]}"><span>${i+1}</span>${s[1]}</button>`).join('')}</nav>
+    <button class="btn small back" data-go="home">Back to the game</button></aside>
+  <div class="notes catalog"><div class="sheet">
+    <div class="eyebrow">Every card in the deck</div>
+    <h2 style="font-size:40px;margin-top:8px">The Card Catalog</h2>
+    <p style="color:var(--ink-soft);font-size:14px">Everything that can turn up in a game. Each season, every player is dealt 3 household cards and 3 parish action cards from these decks. One event and one question are drawn for the whole table.</p>
+
+    <h2 id="c1">1. Household cards <small>${fams.length} cards · pick 1 of 3 each season</small></h2>
+    <p>These decide how your family marries and grows. Births are a percentage of your family, so they compound: Malthus’s geometric growth.</p>
+    <div class="cat-grid">${fams.map(k=>familyCard(k,{tag:'div'})).join('')}</div>
+
+    <h2 id="c2">2. Parish action cards <small>${acts.length} cards · play 0 or 1 of 3 each season</small></h2>
+    <p>Optional moves: relief, work, protest, saving, and escape. Cards with a cost are greyed out in play until you can afford them.</p>
+    <div class="cat-grid">${acts.map(k=>actionCard(k,{tag:'div',state:S})).join('')}</div>
+
+    <h2 id="c3">3. Events <small>${EVENTS.length} events · 1 each season, only in its historical years</small></h2>
+    <p>Events strike the whole parish at harvest. After each one, the report gives Malthus’s reading and Hunt’s reply.</p>
+    <div class="cat-events">${EVENTS.map(e=>`<div class="cat-ev">${eventCard(e.id)}
+      <div class="meta"><div class="eyebrow">Can appear ${e.y0}–${e.y1}</div>
+        <div class="voice h"><div class="who">Hunt replies</div><div class="say">${esc(e.h.replace(/^Hunt:\s*/,''))}</div></div></div></div>`).join('')}</div>
+
+    <h2 id="c4">4. Questions <small>${QUIZ.length} questions · 1 each season, +1 savings if correct</small></h2>
+    <p>Grouped by the matching section of the study notes, so you can use this as a checklist. To test yourself instead, try the <button class="link" data-go="practice" style="color:#2f5a86">Examination Hall</button>.</p>
+    ${(()=>{ let n=0; return QSECTIONS.map(([s,label])=>{ const qs=QUIZ.filter(q=>q.s===s); if(!qs.length) return ''; const start=n+1; n+=qs.length;
+      return `<h3 class="cat-qsec">${esc(label)} <small>${qs.length} question${qs.length>1?'s':''}</small></h3><ol class="cat-quiz" start="${start}">${qs.map(q=>`<li><div class="q">${esc(q.q)}</div>
+      <ul class="opts">${q.o.map((o,i)=>`<li class="${i===q.a?'right':''}">${i===q.a?'<b class="up">✓ '+esc(o)+'</b>':esc(o)}</li>`).join('')}</ul>
+      <p class="why"><b>What it asks:</b> ${esc(q.x)}</p><p class="why"><b>Why:</b> ${esc(q.e)}</p></li>`).join('')}</ol>`; }).join(''); })()}
+    <div class="actions"><button class="btn ghost" data-go="home">Back to the game</button><button class="btn" data-tut="setup">Play pass-and-play</button></div>
+  </div></div></div>`;
+  watchNotes();
+}
+
+/* ---------- the Examination Hall: practice quiz ---------- */
+let practice = null;   // {filter, order:[qIdx], i, picks:{qIdx:choice}, perms:{qIdx:[..]}, label}
+function startPractice(filter='all', only=null){
+  const pool = only || QUIZ.map((_,i)=>i).filter(i=>filter==='all'||QUIZ[i].s===filter);
+  const rng = mulberry(hash('p'+Date.now()));
+  const order = shuffle(pool, rng), perms = {};
+  order.forEach(i=>perms[i]=shuffle(QUIZ[i].o.map((_,j)=>j), rng));
+  practice = {filter, order, i:0, picks:{}, perms, retry:!!only};
+}
+function renderPractice(){
+  if(!practice) startPractice();
+  const P = practice, total = P.order.length, answered = Object.keys(P.picks).length;
+  const correct = P.order.filter(i=>P.picks[i]===QUIZ[i].a).length;
+  const counts = Object.fromEntries(QSECTIONS.map(([s])=>[s, QUIZ.filter(q=>q.s===s).length]));
+  const filters = `<div class="filters" role="group" aria-label="Choose questions">
+    <button class="${P.filter==='all'&&!P.retry?'on':''}" data-pfilter="all">All <small>${QUIZ.length}</small></button>
+    ${QSECTIONS.filter(([s])=>counts[s]).map(([s,l])=>`<button class="${P.filter===s&&!P.retry?'on':''}" data-pfilter="${s}">${esc(l)} <small>${counts[s]}</small></button>`).join('')}
+    ${P.retry?'<button class="on">Retrying missed</button>':''}</div>`;
+  let body;
+  if(P.i >= total){
+    const pct = total ? Math.round(correct/total*100) : 0;
+    const missed = P.order.filter(i=>P.picks[i]!==QUIZ[i].a);
+    const msg = pct===100 ? 'A perfect examination. Malthus would call it prudence; Hunt would call it hard work.' : pct>=80 ? 'Excellent. You know the theory and its critics.' : pct>=60 ? 'A solid pass. Review the ones you missed below.' : 'Keep studying. The explanations below and the study notes will help.';
+    const bySec = QSECTIONS.map(([s,l])=>{const qs=P.order.filter(i=>QUIZ[i].s===s); if(!qs.length) return ''; const ok=qs.filter(i=>P.picks[i]===QUIZ[i].a).length;
+      return `<div class="bar"><span>${esc(l)}</span><span class="t"><i style="width:${ok/qs.length*100}%"></i></span><span class="num">${ok}/${qs.length}</span></div>`}).join('');
+    body = `<div class="pcard presult"><div class="eyebrow">Examination complete</div>
+      <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:8px"><span class="big ${pct>=60?'up-t':'down-t'}">${pct}%</span><span style="font-size:18px">${correct} of ${total} correct</span></div>
+      <p style="font-size:15px">${msg}</p>
+      <h3 style="margin-top:14px">By section</h3><div class="bars">${bySec}</div>
+      ${missed.length?`<h3 style="margin-top:18px">Review what you missed</h3><ol class="missed">${missed.map(i=>{const q=QUIZ[i];return `<li><b>${esc(q.q)}</b><br>You chose: <b class="down">${P.picks[i]==null?'no answer':esc(q.o[P.picks[i]])}</b> · Answer: <b class="up">${esc(q.o[q.a])}</b><br><span style="color:var(--ink-soft)">${esc(q.e)}</span></li>`}).join('')}</ol>`:''}
+      <div class="pfoot"><button class="btn ghost" data-go="notes" style="background:transparent;color:var(--ink)">Open the study notes</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${missed.length?`<button class="btn" data-do="pretry">Retry the ${missed.length} I missed</button>`:''}<button class="btn" data-do="prestart">Start over</button></div></div></div>`;
+    if(once('pdone|'+P.order.join(',')+'|'+correct) && pct>=80) setTimeout(confetti, 150);
+  } else {
+    const qi = P.order[P.i], q = QUIZ[qi], pick = P.picks[qi], done = pick!=null, ok = pick===q.a;
+    body = `<div class="pcard ${once('pq|'+P.order.join(',')+'|'+P.i)?'pop-in':''}">
+      <div class="eyebrow">${esc(secName(q.s))}</div>
+      <div class="qtext">${esc(q.q)}</div>
+      <div class="popts">${P.perms[qi].map((oi,n)=>{
+        const cls = !done ? '' : oi===q.a ? 'right' : oi===pick ? 'wrong' : 'faded';
+        const mk = !done ? '' : oi===q.a ? '✓' : oi===pick ? '✗' : '';
+        return `<button class="popt ${cls}" data-pq="${oi}" ${done?'disabled':''}><span class="ltr">${'ABC'[n]}</span><span>${esc(q.o[oi])}</span><span class="mk">${mk}</span></button>`;}).join('')}</div>
+      ${done?`<div class="pexplain ${ok?'ok':'no'}"><h4 class="${ok?'up-t':'down-t'}">${ok?'Correct!':'Not quite.'}</h4>
+        ${ok?'':`<p>The answer is <b class="up">${esc(q.o[q.a])}</b>.</p>`}
+        <p><b>What it asks:</b> ${esc(q.x)}</p><p><b>Why:</b> ${esc(q.e)}</p></div>`:''}
+      <div class="pfoot"><span class="kbd">${done?'Press Enter for the next question':'Press A, B or C (or 1, 2, 3) to answer'}</span>
+        ${done?`<button class="btn" data-do="pnext">${P.i+1<total?'Next question':'See my results'}</button>`:''}</div></div>`;
+  }
+  $app.innerHTML = `${topbar()}
+  <div class="hall">
+    <div class="hall-head"><div><div class="eyebrow">Practice every examination question</div><h2>The Examination Hall</h2></div>
+      <div class="score">Score <b class="num">${correct}</b> / ${answered}</div></div>
+    ${filters}
+    <div class="progress" aria-hidden="true"><i style="width:${Math.min(100,answered/Math.max(total,1)*100)}%"></i></div>
+    <div class="pmeta"><span>${P.i<total?`Question ${P.i+1} of ${total}`:`Finished ${total} questions`}</span><span>${answered-correct} missed so far</span></div>
+    ${body}
+  </div>`;
+}
+function practicePick(oi){
+  const P = practice; if(!P || P.i>=P.order.length) return;
+  const qi = P.order[P.i]; if(P.picks[qi]!=null) return;
+  P.picks[qi] = oi; render();
+}
+function practiceNext(){ const P=practice; if(!P) return; if(P.picks[P.order[P.i]]==null) return; P.i++; render(); window.scrollTo({top:0,behavior:reduced()?'auto':'smooth'}); }
+
+let notesObs = null;
+function watchNotes(){
+  if(notesObs) notesObs.disconnect();
+  if(!('IntersectionObserver' in window)) return;
+  notesObs = new IntersectionObserver(entries=>{
+    const vis = entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];
+    if(vis) markSec(vis.target.id);
+  }, {rootMargin:'0px 0px -65% 0px'});
+  document.querySelectorAll('.notes h2[id]').forEach(h=>notesObs.observe(h));
+}
+function markSec(id){
+  document.querySelectorAll('.outline button.sec').forEach(b=>{
+    const on = b.dataset.sec===id; b.classList.toggle('on', on);
+    if(on && window.innerWidth<=900){ const nav=b.parentElement; nav.scrollLeft = b.offsetLeft - nav.clientWidth/2 + b.offsetWidth/2; }
+  });
+}
+
+function seasonStepper(){
+  const years = Array.from({length:seasonsPick},(_,i)=>yearAt(i+1,seasonsPick));
+  return `<div class="stepper"><div><div class="eyebrow lbl">Number of seasons ${hint('seasons')}</div>
+    <div class="ctl" style="margin-top:6px"><button data-do="seasons-dec" aria-label="Fewer seasons" ${seasonsPick<=MIN_SEASONS?'disabled':''}>−</button><output aria-live="polite">${seasonsPick}</output><button data-do="seasons-inc" aria-label="More seasons" ${seasonsPick>=MAX_SEASONS?'disabled':''}>+</button></div></div>
+    <div class="desc">Seasons fall in <b>${years.join(', ')}</b>.<br>Minimum ${MIN_SEASONS}, maximum ${MAX_SEASONS}. About ${seasonsPick*3} minutes of play.</div></div>`;
+}
+
+function renderSetup(){
+  const names = localNames || store.get('gl-local-names', ['Ada','Ben','','','','']);
+  $app.innerHTML = `${topbar()}
+  <div class="panel" style="max-width:660px;margin:0 auto">
+    <div class="eyebrow">Pass-and-play</div><h2 style="font-size:32px">Who heads each household?</h2>
+    <p style="color:var(--text-dim)">Fill in 1 to 6 names. Empty rows are skipped.</p>
+    <div class="setup-names">${names.map((n,i)=>`<div class="namefield"><label for="pn${i}">Household ${i+1}</label><input type="text" id="pn${i}" maxlength="18" value="${esc(n)}" placeholder="${i<1?'Required':'Optional'}"></div>`).join('')}</div>
+    ${seasonStepper()}
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-do="start-local">Begin in 1798</button><button class="btn ghost" data-go="home">Back</button></div>
+    ${store.get('gl-local-save',null)?.state?.v===4?'<p style="margin-top:14px"><button class="link" data-do="resume-local">Resume the saved table game</button></p>':''}
+  </div>`;
+}
+let localNames = null;
+function keepNames(){
+  if(view!=='setup' || !document.getElementById('pn0')) return localNames;
+  localNames = [...Array(6)].map((_,i)=>document.getElementById('pn'+i)?.value.trim()||'');
+  store.set('gl-local-names', localNames);
+  return localNames;
+}
+
+function renderLobby(){
+  const name = store.get('gl-name','');
+  $app.innerHTML = `${topbar()}
+  <div class="lobby">
+    <div class="panel">
+      <div class="eyebrow">Online parish</div><h2 style="font-size:30px">Open a new room</h2>
+      <div class="namefield" style="margin-top:12px"><label for="myname">Your household name</label><input type="text" id="myname" maxlength="18" value="${esc(name)}" placeholder="e.g. The Hartleys"></div>
+      <button class="btn" data-do="create-room">Open a room</button>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:14px">You’ll choose the number of seasons in the room before you begin. Classmates see your room listed on the right and can join until you start.</p>
+      <div class="namefield" style="margin-top:14px"><label for="joincode">Or join by code</label><div style="display:flex;gap:8px"><input type="text" id="joincode" maxlength="4" placeholder="ABCD" style="text-transform:uppercase"><button class="btn small" data-do="join-code">Join</button></div></div>
+      ${online.error?`<p class="tag bad" style="font-size:13px">${esc(online.error)}</p>`:''}
+    </div>
+    <div class="panel"><div class="head"><h2>Rooms gathering players</h2></div><div class="roomlist" id="roomlist"></div></div>
+  </div>`;
+  renderRoomList();
+  watchRooms();
+}
+function renderRoomList(){
+  const el = document.getElementById('roomlist'); if(!el) return;
+  const rooms = online.rooms.filter(r=>r.phase==='lobby' && Date.now()-(r.created||0) < 6*3600e3).sort((a,b)=>b.created-a.created);
+  el.innerHTML = rooms.length ? rooms.map(r=>`<div class="roomrow"><div><div class="code">${esc(r.code)}</div><div style="font-size:12px;color:var(--text-dim)">opened ${Math.max(1,Math.round((Date.now()-r.created)/60000))} min ago</div></div><button class="btn small" data-join="${esc(r.code)}">Join</button></div>`).join('')
+    : '<div class="notice">No rooms are open yet. Open one and share the code.</div>';
+}
+
+function localCtx(){
+  const st = local.state;
+  return {mode:'local', me:st.order[local.turn], locked:false, ready:new Set(Object.keys(local.moves)), isHost:true};
+}
+
+function renderGame(st, ctx){
+  const r = st.over ? st.maxRounds : st.round;
+  const last = st.history[st.history.length-1];
+  const pop = st.order.reduce((a,id)=>a+st.players[id].family,0) + st.npc;
+  const nextFood = st.over ? last.food : r1(st.food + (st.round>1?st.growth:0));
+  const w = st.lastWage;
+  const wtag = w<.95?'<span class="tag bad">▼ below subsistence: misery</span>':w<1.05?'<span class="tag meh">● at subsistence</span>':'<span class="tag good">▲ above subsistence: surplus</span>';
+  const evId = st.over ? st.report.event : st.events[st.round-1];
+  const codeChip = ctx.mode==='online' ? `<span class="chip">Room <b class="num">${esc(online.code)}</b></span>` : '<span class="chip">Pass-and-play</span>';
+  const isMe = id => id===ctx.me && ctx.mode==='online';
+
+  const houses = st.order.map(id=>{
+    const p = st.players[id];
+    const status = st.over || ctx.mode==='local' ? '' : ctx.ready.has(id) ? '<span class="st ready">locked in</span>' : '<span class="st wait">deciding…</span>';
+    return `<div class="house${isMe(id)?' me':''}">
+      <div class="top"><span class="nm">${esc(p.name)}${isMe(id)?' <span style="font-family:var(--ui);font-size:11px;color:var(--wheat)">(you)</span>':''}</span>${status}</div>
+      <div class="people" aria-label="${p.family} living, ${p.emigrants} emigrated, ${p.deaths} lost">${people(p)}</div>
+      <div class="ledger"><div>Family<b>${p.family}</b></div><div>Savings<b>${r1(p.savings)}</b></div><div>Comfort<b>${r1(p.comfort)}</b></div><div>Legacy<b>${score(p)}</b></div></div>
+      <div class="parson">${PARSON(p.virtue)}</div></div>`;
+  }).join('');
+
+  const parish = `<div class="panel">
+    <div class="yearline"><div><div class="eyebrow lbl">${st.over?'The final reckoning':'Season '+r+' of '+st.maxRounds} ${hint('season')}</div><div class="year">${st.over?'1833':yearOf(st.round,st)}</div></div>
+      <div class="pips" aria-hidden="true">${Array.from({length:st.maxRounds},(_,i)=>`<span class="pip ${i+1<st.round?'done':i+1===st.round&&!st.over?'now':''}"></span>`).join('')}</div></div>
+    <div class="stats">
+      <div class="stat pop"><div class="s">Mouths ${hint('pop')}</div><div class="v">${pop}</div><div class="s">grows by % (geometric)</div></div>
+      <div class="stat food"><div class="s">${st.over?'Last harvest':'Harvest'} ${hint('food')}</div><div class="v">${st.over?last.food:nextFood}</div><div class="s">+${st.growth} a season (arithmetic)</div></div>
+      <div class="stat wage"><div class="s">Last real wage ${hint('wage')}</div><div class="v">${w.toFixed(2)}</div>${wtag}</div>
+    </div>
+    <div class="charts">
+      <div><div class="eyebrow lbl">Mouths vs. loaves ${hint('chartpf')}</div>${chartSVG(st.history,'pf')}<div class="legend"><span><i style="background:var(--madder)"></i>Population</span><span><i style="background:var(--wheat)"></i>Food available</span></div></div>
+      <div><div class="eyebrow lbl">Real wage (loaves per head) ${hint('chartw')}</div>${chartSVG(st.history,'w')}<div class="legend"><span><i style="background:var(--indigo)"></i>Wage</span><span><i style="background:var(--paper)"></i>Subsistence = 1</span></div></div>
+    </div>
+    ${st.over?'':`<div class="event-now">${eventCard(evId, once('ev|'+st.seed+'|'+st.round)?'flip':'')}<div><div class="eyebrow lbl">This season’s event ${hint('event')}</div><p>Drawn now, it takes effect when the season resolves. Plan around it.</p>
+      <p style="font-size:13px">${st.cornLaw?'<b class="down">Corn Law in force:</b> landlords take 10% of the harvest. ':''}Poor relief covers up to ${st.reliefCap} loaves. Combination risk ${Math.round(st.unionRisk*100)}%.${st.poorRate?` <b class="down">Poor rate owed: ${st.poorRate} loaves</b> come off this harvest.`:''}</p></div></div>`}
+  </div>`;
+
+  const side = `<div class="panel"><div class="head"><h2>The households</h2><span class="eyebrow lbl">Legacy is your score ${hint('legacy')}</span></div>
+    <div class="houses">${houses}</div>
+    <p class="key">Each figure is one person: <span><i class="person"></i>living</span>, <span><i class="person gone"></i>emigrated or left home</span>, <span><i class="person lost"></i>lost</span>.</p>
+    <p class="parish-npc" style="margin-top:12px">The rest of the parish: <b class="num" style="color:var(--text);margin-inline:4px">${st.npc}</b> laboring poor, who marry early whenever wages allow. ${hint('npc')}</p></div>`;
+
+  const yr = yearOf(st.round,st);
+  const waitingOn = st.order.filter(id=>!ctx.ready.has(id)).map(id=>esc(st.players[id].name)).join(', ');
+  let lower = '';
+  if(st.over) lower = finalBlock(st);
+  else if(ctx.spectator) lower = `<div class="waiting hand"><h3>You’re watching this parish</h3><p>This game began before you joined. Open a new room from the lobby to play.</p></div>`;
+  else if(ctx.mode==='local') lower = `<div class="board-cta"><div><h3>Season ${st.round} of ${st.maxRounds} · ${yr}</h3><p>Look over the parish, then pass the device to <b>${esc(st.players[st.order[0]].name)}</b> to take the first turn.</p></div><button class="btn" data-do="begin-season">Begin season ${st.round}</button></div>`;
+  else if(ctx.locked) lower = `<div class="board-cta"><div><h3>Locked in for ${yr}</h3><p>Waiting for ${waitingOn||'the harvest'}…</p>${ctx.isHost?'<p><button class="link" data-do="force-resolve">Resolve now (anyone still deciding plays Moral Restraint with no action)</button></p>':''}</div></div>`;
+  else lower = `<div class="board-cta"><div><h3>Season ${st.round} of ${st.maxRounds} · ${yr}</h3><p>Look over the parish, then take your turn.${waitingOn?` Still deciding: ${waitingOn}.`:''}</p></div><button class="btn" data-do="take-turn">Take my turn</button></div>`;
+
+  $app.innerHTML = `${topbar(codeChip)}<div class="board">${parish}${side}</div>${lower}`;
+}
+
+function curtainScreen(st, me, codeChip){
+  const n = esc(st.players[me].name);
+  $app.innerHTML = `${topbar(codeChip)}<div class="waiting curtain" style="max-width:560px;margin:40px auto"><div class="card back"></div><h3>Pass the device to ${n}</h3><p>Everyone else, look away. ${n}’s hand stays hidden until they’re ready.</p><button class="btn" data-do="reveal-hand">I’m ${n}: show my hand</button></div>`;
+}
+
+function turnScreen(st, me, codeChip){
+  const p = st.players[me];
+  const key = st.seed+'|'+st.round+'|'+me;
+  if(sel.key !== key) sel = {key, family:null, action:null, actionIdx:null, quiz:null};
+  const deal = once('deal|'+key);
+  const q = QUIZ[st.quiz[st.round-1]];
+  const evId = st.events[st.round-1];
+  const pop = st.order.reduce((a,id)=>a+st.players[id].family,0) + st.npc;
+  const harvest = r1(st.food + (st.round>1?st.growth:0));
+  const w = st.lastWage, wk = w<.95?'down':w>=1.05?'up':'neutral';
+  const famSum = sel.family ? FAMILY[sel.family].title : '<span class="down-t">pick a household card</span>';
+  const actSum = sel.action ? ACTIONS[sel.action].title : 'no action';
+  $app.innerHTML = `${topbar(codeChip)}
+  <section class="turn">
+    <div class="turn-head">
+      <div><div class="eyebrow">Season ${st.round} of ${st.maxRounds} · ${yearOf(st.round,st)}</div><h2>${esc(p.name)}’s turn</h2></div>
+      <div class="glance"><span class="lbl">Parish ${hint('glance')}</span><span>Last wage <b class="${wk}">${w.toFixed(2)}</b></span><span>Harvest <b>${harvest}</b></span><span>Mouths <b>${pop}</b></span>${st.poorRate?`<span>Poor rate <b class="down">−${st.poorRate}</b></span>`:''}${st.cornLaw?'<span><b class="down">Corn Law in force</b></span>':''}</div>
+    </div>
+    <div class="turn-grid">
+      <aside class="turn-side">
+        <div><div class="eyebrow lbl" style="margin-bottom:6px">This season’s event ${hint('event')}</div>${eventCard(evId, deal?'flip':'')}</div>
+        <div class="mystats"><div class="top" style="display:flex;justify-content:space-between;align-items:center"><span class="nm">${esc(p.name)}</span>${hint('pstats')}</div>
+          <div class="people">${people(p)}</div>
+          <div class="ledger"><div>Family<b>${p.family}</b></div><div>Savings<b>${r1(p.savings)}</b></div><div>Comfort<b>${r1(p.comfort)}</b></div><div>Legacy<b>${score(p)}</b></div></div>
+          <div class="parson">${PARSON(p.virtue)}</div></div>
+      </aside>
+      <div class="turn-main">
+        <div class="eyebrow lbl">1. How will your family marry this season? Pick one of the 3 you were dealt ${hint('famcards')}</div>
+        <div class="cards">${(p.famHand||['early','late','control']).map((k,i)=>familyCard(k,{state:st,selected:sel.family===k,dim:sel.family&&sel.family!==k,cls:deal?'flip':'',d:deal?i*110:null})).join('')}</div>
+        <div class="eyebrow lbl" style="margin-top:12px">2. Parish actions in your hand (optional) ${hint('actcards')}</div>
+        <div class="cards">${p.hand.map((k,i)=>actionCard(k,{state:st,player:p,selected:sel.action===k&&sel.actionIdx===i,idx:i,cls:deal?'flip':'',d:deal?330+i*110:null})).join('')}</div>
+      </div>
+      <aside class="turn-right">
+        <div class="quiz"><div class="eyebrow lbl">3. Question · +1 savings ${hint('quiz')}</div>
+          <div class="q">${esc(q.q)}</div>
+          <div class="opts">${shuffle(q.o.map((_,i)=>i), mulberry(hash(st.seed+'|qo'+st.round+'|'+me))).map(i=>`<button class="opt${sel.quiz===i?' sel':''}" data-quiz="${i}">${esc(q.o[i])}</button>`).join('')}</div></div>
+        <div class="choices"><div class="eyebrow lbl">Your choices ${hint('lock')}</div>
+          <dl><div><dt>Household</dt><dd>${famSum}</dd></div><div><dt>Action</dt><dd>${actSum}</dd></div><div><dt>Question</dt><dd>${sel.quiz==null?'<span class="dim-t">unanswered</span>':esc(q.o[sel.quiz])}</dd></div></dl>
+          <button class="btn lockbtn" data-do="lock" ${sel.family?'':'disabled'}>Lock in for ${yearOf(st.round,st)}</button></div>
+      </aside>
+    </div>
+  </section>`;
+}
+
+function storyOf(st){
+  const h = st.history, first = h[0], last = h[h.length-1], rounds = h.slice(1);
+  const pct = (a,b) => Math.round((b-a)/a*100);
+  const pP = pct(first.pop,last.pop), pF = pct(first.food,last.food);
+  const below = rounds.filter(r=>r.wage<1).length;
+  let hi = rounds[0], lo = rounds[0], cross = 0;
+  rounds.forEach((r,i)=>{ if(r.wage>hi.wage) hi=r; if(r.wage<lo.wage) lo=r; const prev = i? rounds[i-1].wage : first.wage; if((prev>=1)!==(r.wage>=1)) cross++; });
+  const pf = pP > pF
+    ? `Population went from <b>${first.pop}</b> to <b>${last.pop}</b> (<b>${pP>=0?'+':''}${pP}%</b>), while the food available went from <b>${first.food}</b> to <b>${last.food}</b> (<b>${pF>=0?'+':''}${pF}%</b>). Mouths grew faster than loaves, just as Malthus predicted: births compound, but the harvest only adds a fixed amount each season.`
+    : `Population went from <b>${first.pop}</b> to <b>${last.pop}</b> (<b>${pP>=0?'+':''}${pP}%</b>), while food went from <b>${first.food}</b> to <b>${last.food}</b> (<b class="up">${pF>=0?'+':''}${pF}%</b>). Here food kept pace with mouths, because restraint, land improvements, emigration, or the positive checks (deaths from hunger and disease) held population down. Ask which of those did the work in your game.`;
+  const wg = `The wage started at <b>${first.wage.toFixed(2)}</b> and ended at <b class="${last.wage<1?'down':'up'}">${last.wage.toFixed(2)}</b>. It fell below subsistence in <b class="${below?'down':'up'}">${below} of ${rounds.length}</b> seasons. The high point was <b>${hi.wage.toFixed(2)}</b> in ${hi.year} and the low point was <b>${lo.wage.toFixed(2)}</b> in ${lo.year}. `
+    + (cross>=2 ? `The line crossed the dashed subsistence line <b>${cross} times</b>. That is the Malthusian wage cycle: every surplus brought more births, and every shortfall brought hunger and deaths, pulling the wage back toward 1.`
+      : `The line stayed mostly on one side of subsistence. Malthus would say that can’t last: a lasting surplus invites more births, and a lasting shortfall thins the population until the wage recovers.`);
+  return {pf, wg};
+}
+function roundNote(r){
+  if(r.wage < .95) return '<b class="down">Positive check:</b> shortfall, savings drained, deaths';
+  if(r.wage < 1.05) return '<b>At subsistence:</b> births and food barely balanced';
+  return '<b class="up">Surplus:</b> expect a birth surge next season';
+}
+function finalBlock(st){
+  const ranked = st.order.map(id=>st.players[id]).sort((a,b)=>score(b)-score(a));
+  const virt = st.order.map(id=>st.players[id]).sort((a,b)=>b.virtue-a.virtue)[0];
+  const story = storyOf(st);
+  const rows = st.history.slice(1).map((r,i)=>{
+    const ev = EVENTS.find(e=>e.id===r.ev);
+    const top = r.picks ? Object.entries(r.picks).sort((a,b)=>b[1]-a[1])[0] : null;
+    return `<tr><td class="n" style="text-align:left">${i+1}<div style="font-size:11px;color:var(--ink-soft)">${r.year}</div></td>
+      <td>${ev?esc(ev.title):'—'}</td>
+      <td class="n"><b class="${r.wage<1?'down':r.wage>=1.05?'up':'neutral'}">${r.wage.toFixed(2)}</b></td>
+      <td>${r.births!=null?`<b class="up">+${r.births}</b> / <b class="${r.lost?'down':'neutral'}">−${r.lost}</b>`:'—'}</td>
+      <td>${r.npcB!=null?`<b class="up">+${r.npcB}</b> / <b class="${r.npcD?'down':'neutral'}">−${r.npcD}</b>`:'—'}</td>
+      <td>${top?`${esc(FAMILY[top[0]].title)}${top[1]>1?` ×${top[1]}`:''}`:'—'}</td>
+      <td style="font-size:12.5px">${roundNote(r)}${r.relief?`; relief paid ${r.relief}`:''}</td></tr>`;
+  }).join('');
+  return `<section class="hand"><div class="sheet" style="max-width:none">
+    <div class="eyebrow">1833 · Malthus dies the following year</div><h2>The final reckoning</h2>
+    <div class="final-rank">${ranked.map((p,i)=>`<div class="rankrow${i===0?' winner':''}"><span class="pos">${i+1}</span><div><div style="font-family:var(--display);font-size:20px">${esc(p.name)}${i===0?' <span class="crown">♛</span>':''}</div><div class="br">${p.family} living · ${p.emigrants} left home · ${r1(p.savings)} saved · ${r1(p.comfort)} comfort · <b class="${p.deaths?'down':'neutral'}">${p.deaths} lost</b> · ${PARSON(p.virtue)}</div></div><span class="sc">${score(p)}</span></div>`).join('')}</div>
+
+    <div class="sec-h"><h3>What the graphs show</h3></div>
+    <div class="finalcharts">
+      <div class="chartbox"><div class="eyebrow">Mouths vs. loaves</div>${chartSVG(st.history,'pf')}<div class="legend"><span><i style="background:var(--madder)"></i>Population</span><span><i style="background:var(--wheat)"></i>Food available</span></div></div>
+      <p>${story.pf}</p>
+      <div class="chartbox"><div class="eyebrow">Real wage (loaves per head)</div>${chartSVG(st.history,'w')}<div class="legend"><span><i style="background:var(--indigo)"></i>Wage</span><span><i style="background:var(--paper)"></i>Subsistence = 1</span></div></div>
+      <p>${story.wg}</p>
+    </div>
+
+    <div class="sec-h"><h3>Season by season</h3></div>
+    <div class="tblwrap"><table><thead><tr><th>Season</th><th>Event</th><th style="text-align:right">Wage</th><th>Households born / lost</th><th>Rest of parish born / died</th><th>Most chosen</th><th>What it shows</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="voices">
+      <div class="voice m"><div class="who">Malthus would say</div><div class="say">Your parish shows the principle at work. Whenever wages rose, marriages followed and wages fell again. Only the prudent, who practiced moral restraint, kept anything.</div></div>
+      <div class="voice h"><div class="who">Hunt would answer</div><div class="say">Look at who carried the losses: whoever had no savings to fall back on. Malthus treated that as moral failure. It was the structure of property, rents and wages.</div></div>
+    </div>
+    <div class="insight"><b>Discuss:</b> The parson liked <b>${esc(virt.name)}</b> best. Did virtue predict Legacy in your game? What happened to the wage whenever everyone “married young” at once? And did relief, emigration or land improvement ever break the trap for good, or only delay it?</div>
+    <div class="actions"><button class="btn ghost" data-open="guide">Review the theory</button><button class="btn" data-go="home">Play again</button></div>
+  </div></section>`;
+}
+
+/* ---------- tutorial ---------- */
+function tutSteps(){
+  const mp = (n,g=0,l=0)=>`<div class="mini-people">${'<span></span>'.repeat(n)}${'<span class="gone"></span>'.repeat(g)}${'<span class="lost"></span>'.repeat(l)}</div>`;
+  const geo=[1,2,4,8,16,32], ari=[1,2,3,4,5,6];
+  const bars = `<svg viewBox="0 0 260 170" style="width:100%;max-width:300px" role="img" aria-label="Geometric population bars outgrow arithmetic food bars">
+    ${geo.map((v,i)=>`<rect x="${14+i*40}" y="${150-v*4.2}" width="14" height="${v*4.2}" fill="#c2553b"/><rect x="${30+i*40}" y="${150-ari[i]*4.2}" width="14" height="${ari[i]*4.2}" fill="#dca845"/><text x="${29+i*40}" y="164" font-size="10" text-anchor="middle" fill="#6b5f52">${i*25}y</text>`).join('')}
+    <text x="14" y="12" font-size="11" fill="#c2553b">■ population 1, 2, 4, 8…</text><text x="14" y="26" font-size="11" fill="#8a5a14">■ food 1, 2, 3, 4…</text></svg>`;
+  return [
+    {t:'You head a household', vis:`${mp(6)}<div style="width:100%;text-align:center;font-size:13px;color:var(--ink-soft)">6 people, 2 savings, England, 1798</div>`,
+      b:`<p>Each player runs a working family in one English parish. The game lasts a set number of <b>seasons</b> between 1798 and 1833.</p><p>Your goal is the highest <b>Legacy</b> by the end: the people who survive, plus what you’ve saved and the comfort you’ve enjoyed.</p>`},
+    {t:'Pick one household card', vis:familyCard('early',{tag:'div'})+familyCard('late',{tag:'div'}),
+      b:`<p>Every season you choose <b>how your family marries</b>. Each card adds births as a <b>percentage</b> of your family.</p><ul><li><b class="up">Green</b> words are gains and <b class="down">red</b> words are costs.</li><li>Think about the wage before you choose. More children means more mouths when the harvest is split.</li></ul>`},
+    {t:'Mouths multiply, loaves add up', vis:bars,
+      b:`<p>Births compound, so population grows <b>geometrically</b>. The parish harvest only grows by a fixed amount each season, which is <b>arithmetic</b> growth.</p><p>That gap is Malthus’s whole argument, and you’ll watch it happen on the board’s charts.</p>`},
+    {t:'The wage decides everything', vis:`<div style="width:100%"><div class="formula">48 loaves ÷ 40 mouths = 1.20<small>harvest ÷ population = real wage</small></div><div class="gauge" style="margin-inline:auto"><i style="left:68%"></i></div></div>`,
+      b:`<p>At harvest, every person gets the <b>real wage</b> in loaves. <b>1.00 is subsistence.</b></p><ul><li>Above 1: your family saves the <b class="up">surplus</b>.</li><li>Below 1: <b class="down">savings drain</b> first, then relatives die.</li></ul><p>The rest of the parish has more children whenever wages rise, which pulls the wage back down.</p>`},
+    {t:'Actions and events', vis:actionCard('relief',{tag:'div'})+`<div style="transform:scale(.9)">${eventCard('dearth')}</div>`,
+      b:`<p>You hold <b>3 action cards</b>, such as poor relief, joining a union, emigrating or improving the land. Play <b>one or none</b> each season. Cards you can’t afford yet are <b>greyed out</b>.</p><p>An <b>event card</b> is revealed at the start of each season and strikes at harvest, so plan around it.</p><p>Each turn gets its own screen: the event, your household, and your cards. Between seasons, everyone looks at the full parish board together.</p>`},
+    {t:'The question and the report', vis:`<div class="quiz" style="margin:0;max-width:260px"><div class="eyebrow">Question</div><div class="q" style="font-size:15px">Which is a PREVENTIVE check?</div><div class="opts"><span class="opt">Famine</span><span class="opt sel">Late marriage</span></div></div>`,
+      b:`<p>Answer one question about Malthus each season for <b class="up">+1 savings</b>.</p><p>After the harvest, a <b>parish ledger</b> shows what happened to each household, explains the question, and gives you Malthus’s view and Hunt’s critique side by side.</p>`},
+    {t:'Scoring and hints', vis:`<div style="text-align:center"><div class="formula" style="font-size:17px">Legacy = family + emigrants<br>+ savings + comfort<br><b class="down">− 2 × each relative lost</b></div></div>`,
+      b:`<p>The parson judges your morals the way Malthus would, but his opinion <b>doesn’t score</b>. Check whether virtue actually pays.</p><p>Tap any <span class="bulb" style="display:inline-flex">${BULB}</span> during the game for a quick explanation. You can switch hints off with the toggle at the top.</p>`}
+  ];
+}
+function tutorialSheet(){
+  const steps = tutSteps(), i = tut.step, s = steps[i], lastStep = i===steps.length-1;
+  return `<div class="overlay"><div class="sheet tut" role="dialog" aria-label="How to play">
+    <div class="steps" aria-hidden="true">${steps.map((_,j)=>`<span class="${j<=i?'on':''}"></span>`).join('')}</div>
+    <div class="eyebrow">How to play · ${i+1} of ${steps.length}</div>
+    <div class="body"><div class="vis">${s.vis}</div><div><h2>${s.t}</h2>${s.b}</div></div>
+    <div class="foot"><button class="btn ghost" data-do="tut-skip">Skip tutorial</button>
+      <div class="r">${i>0?'<button class="btn ghost" data-do="tut-back">Back</button>':''}<button class="btn" data-do="${lastStep?'tut-skip':'tut-next'}">${lastStep?(tut.next?'Let’s play':'Done'):'Next'}</button></div></div>
+  </div></div>`;
+}
+
+function renderLayer(){
+  if(overlay==='tutorial'){ $layer.innerHTML = tutorialSheet(); return; }
+  if(overlay==='guide'){ $layer.innerHTML = `<div class="overlay" data-close><div class="sheet guide" role="dialog" aria-label="Field guide">
+    <div class="eyebrow">Field guide</div><h2>How the game models Malthus</h2>
+    <p>The Great Lottery is a working model of Malthus’s population theory from his 1798 <i>Essay on the Principle of Population</i>, as Hunt and Lautzenheiser present it in Chapter 4.</p>
+    <div class="map">
+      <div>Population grows geometrically</div><div>Births are a percentage of each family, so growth compounds. The rest of the parish breeds harder when wages are high.</div>
+      <div>Food grows arithmetically</div><div>The harvest adds a fixed amount each season. Improving the land adds less each time (diminishing returns).</div>
+      <div>The real wage</div><div>Food available ÷ total population. 1.0 loaf a head is subsistence.</div>
+      <div>Preventive checks (fewer births)</div><div>Moral Restraint, Wait for Good Times, Prevent Births, and hunger halving births when the wage is below 1.</div>
+      <div>Positive checks (more deaths)</div><div>Shortfalls you can’t cover kill family members. So do typhus, cholera, war and harvest failure.</div>
+      <div>Moral restraint, vice and misery</div><div>The parson’s opinion tracks Malthus’s moral judgments. It never scores, so you can test whether virtue actually pays.</div>
+      <div>Poor Laws and the workhouse</div><div>Relief saves your family but costs the whole parish food the next season. That is Malthus’s objection.</div>
+      <div>Combination Act, Corn Laws, mills</div><div>Hunt’s history: the class conflicts of Malthus’s times.</div>
+    </div>
+    <h3>The wage cycle to watch for</h3>
+    <p>Wage above 1 → surplus and more marriages → population jumps → wage falls below 1 → savings drain, deaths → population falls back → wage recovers… Malthus claimed this cycle keeps workers near subsistence forever.</p>
+    <h3>Hunt’s critique, in play</h3>
+    <ul><li>Malthus blamed poverty on the poor’s lack of restraint. In the game, whoever has no savings buffer suffers first, whatever their virtue.</li>
+    <li>He opposed all redistribution. Try relief and see who pays for it and who gains.</li>
+    <li>Later, in his <i>Principles</i> (1820), he opposed higher wages because they cut profits, not because of population.</li></ul>
+    <div class="actions"><button class="btn" data-close>Back to the table</button></div></div></div>`; return; }
+  if(overlay==='report'){ const st = currentState(); if(st && st.report){ $layer.innerHTML = reportSheet(st); if(once('count|'+st.seed+'|'+st.report.round)) countUp(); return; } }
+  $layer.innerHTML = '';
+}
+
+/* ---------- little celebrations ---------- */
+const reduced = () => { try{ return matchMedia('(prefers-reduced-motion: reduce)').matches }catch(e){ return false } };
+function countUp(){
+  if(reduced()) return;
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const to = +el.dataset.count, t0 = performance.now(), dur = 900;
+    const step = t => { const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3); el.textContent = (to*e).toFixed(2); if(k<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function showStamp(text){
+  if(reduced()) return;
+  const el = document.createElement('div'); el.className='stamp'; el.textContent=text; document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 950);
+}
+function confetti(){
+  if(reduced()) return;
+  const box = document.createElement('div'); box.className='confetti';
+  const cols = ['#dca845','#eee6d3','#c2553b','#7fa3cf','#8fc29a'];
+  for(let i=0;i<70;i++){
+    const c = document.createElement('i');
+    c.style.left = Math.random()*100+'vw'; c.style.background = cols[i%cols.length];
+    c.style.animationDuration = (2.2+Math.random()*2)+'s'; c.style.animationDelay = (Math.random()*.8)+'s';
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    box.appendChild(c);
+  }
+  document.body.appendChild(box); setTimeout(()=>box.remove(), 5200);
+}
+
+function lineHTML(x){
+  if(typeof x==='string') return `<div class="ln">${esc(x)}</div>`;
+  return `<div class="ln">${esc(x.l)}: <b class="${x.k}">${esc(x.v)}</b></div>`;
+}
+function reportSheet(st){
+  const R = st.report, ev = EVENTS.find(e=>e.id===R.event), q = QUIZ[R.quiz];
+  const rows = st.order.map(id=>{
+    const p=st.players[id], c=R.chose[id], s0=(R.start||{})[id];
+    const df = s0 ? p.family - s0.family : 0, dl = s0 ? score(p) - s0.legacy : 0;
+    const d = v => v ? ` <b class="${v>0?'up':'down'}">(${v>0?'+':''}${v})</b>` : '';
+    return `<tr><td><b>${esc(p.name)}</b><div style="font-size:11.5px;color:var(--ink-soft)">${FAMILY[c.family].title}${c.action?' · '+ACTIONS[c.action].title:''}</div></td>
+      <td>${(R.lines[id]||[]).map(lineHTML).join('') || '<div class="ln">A quiet season.</div>'}</td><td class="n">${p.family}${d(df)}</td><td class="n">${score(p)}${d(dl)}</td></tr>`;
+  }).join('');
+  const whoRight = st.order.map(id=>{const ok=R.answers[id]===q.a;return `<b class="${ok?'up':'down'}">${ok?'✓':'✗'} ${esc(st.players[id].name)}</b>`}).join(' &nbsp; ');
+  return `<div class="overlay"><div class="sheet" role="dialog" aria-label="Harvest report ${R.year}">
+    <div class="toprow">${eventCard(R.event, once('rep|'+st.seed+'|'+R.round)?'flip':'')}
+      <div class="col"><div class="eyebrow">Parish ledger · harvest of ${R.year}</div><h2>${ev.title}</h2>
+        <div style="display:flex;gap:28px;flex-wrap:wrap;margin-top:14px">
+          <div><div class="eyebrow lbl">Real wage ${hint('rwage')}</div><div class="bigw ${R.wage<1?'down-t':R.wage>=1.05?'up-t':''}"><span data-count="${R.wage}">${R.wage.toFixed(2)}</span> <small>loaves / head</small></div></div>
+          <div><div class="eyebrow">Food ÷ mouths</div><div class="bigw" style="font-size:28px">${R.avail} ÷ ${R.pop}</div></div>
+        </div>
+        <p style="font-size:13px;margin:10px 0 0">Households: <b class="up">+${R.births} born</b>, <b class="${R.deaths?'down':'neutral'}">${R.deaths} lost to want</b>. Rest of the parish: <b class="up">+${R.npcBirths} born</b>, <b class="${R.npcDeaths?'down':'neutral'}">${R.npcDeaths} died</b>.${R.reliefPaid?` Relief paid: <b class="down">${R.reliefPaid} loaves</b> owed next season.`:''}</p>
+      </div></div>
+    <div class="insight">${esc(R.insight)}</div>
+    <div class="sec-h"><h3>What happened to each household</h3>${hint('rtable')}</div>
+    <div class="tblwrap"><table><thead><tr><th>Household</th><th>What happened</th><th style="text-align:right">Family</th><th style="text-align:right">Legacy</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="sec-h"><h3>The question, explained</h3>${hint('rexam')}</div>
+    <div class="exam">
+      <div class="row"><div>The question</div><div class="q">${esc(q.q)}</div></div>
+      <div class="row"><div>What it asks</div><div>${esc(q.x||'')}</div></div>
+      <div class="row"><div>Answer</div><div><b class="up">${esc(q.o[q.a])}</b></div></div>
+      <div class="row"><div>Why</div><div>${esc(q.e)}</div></div>
+      <div class="row"><div>Who got it</div><div>${whoRight}</div></div>
+    </div>
+    <div class="sec-h"><h3>Two voices</h3>${hint('rvoices')}</div>
+    <div class="voices"><div class="voice m"><div class="who">Malthus says</div><div class="say">${esc(ev.m)}</div></div><div class="voice h"><div class="who">Hunt replies</div><div class="say">${esc(ev.h.replace(/^Hunt:\s*/,''))}</div></div></div>
+    <div class="actions"><button class="btn" data-do="close-report">${st.over?'See the final results':'On to '+yearOf(st.round,st)}</button></div>
+  </div></div>`;
+}
+
+/* ---------- hint popover ---------- */
+function closePop(){ $pop.innerHTML=''; }
+function openPop(btn){
+  const h = HINTS[btn.dataset.hint]; if(!h) return;
+  $pop.innerHTML = `<div id="pop" role="dialog" aria-label="${esc(h[0])}"><button class="x" data-do="close-pop" aria-label="Close hint">×</button><h4>${esc(h[0])}</h4><div>${h[1]}</div></div>`;
+  const el = document.getElementById('pop'), r = btn.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+  const w = Math.min(300, vw-32); el.style.width = w+'px';
+  let left = Math.min(Math.max(16, r.left + r.width/2 - w/2), vw - w - 16);
+  el.style.left = left+'px';
+  const hgt = el.offsetHeight;
+  el.style.top = (r.bottom + 8 + hgt < vh ? r.bottom + 8 : Math.max(8, r.top - hgt - 8)) + 'px';
+}
+
+function currentState(){ return view==='local' ? local?.state : view==='room' ? online.room?.game : null }
+function maybeShowReport(){
+  const st = currentState(); if(!st || !st.report) return;
+  const k = (view==='local'?'L':online.code)+'|'+st.seed+'|'+st.report.round;
+  if(!seen[k]){ seen[k]=1; store.set('gl-seen', seen); overlay='report'; }
+}
+
+/* =========================================================
+   LOCAL MODE
+   ========================================================= */
+function startLocal(){
+  const names = keepNames() || [];
+  const plist = names.map((n,i)=>({id:'p'+i, name:n})).filter(p=>p.name);
+  if(!plist.length){ const f=document.getElementById('pn0'); f.placeholder='Enter at least one name'; f.style.borderColor='var(--down)'; f.focus(); return; }
+  local = {state:newGame(plist, 'local-'+Date.now(), seasonsPick), moves:{}, turn:0, curtain:plist.length>1, phase:'board'};
+  saveLocal(); view='local'; render();
+}
+function beginSeason(){ local.phase='turns'; local.turn=0; local.moves={}; local.curtain = local.state.order.length>1; saveLocal(); render(); window.scrollTo(0,0); }
+function saveLocal(){ store.set('gl-local-save', local && !local.state.over && local.state.v===4 ? local : null) }
+function lockLocal(){
+  const st = local.state, me = st.order[local.turn];
+  local.moves[me] = {family:sel.family, action:sel.action, quiz:sel.quiz};
+  if(local.turn < st.order.length-1){ local.turn++; local.curtain = true; }
+  else { local.state = resolveRound(st, local.moves); local.moves = {}; local.turn = 0; local.phase = 'board'; maybeShowReport(); }
+  saveLocal(); render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* =========================================================
+   ONLINE MODE (db capability)
+   rooms/{CODE}              room + game state
+   rooms/{CODE}/moves/{uid}  each player's join + current move
+   ========================================================= */
+function watchRooms(){
+  if(!caps.db || online.roomsUnsub) return;
+  online.roomsUnsub = caps.db.collection('rooms').where('phase','==','lobby').limit(50).onSnapshot(
+    snap => { online.rooms = snap.docs.map(d=>d.data()); renderRoomList(); }, () => {});
+}
+function myName(){ const el=document.getElementById('myname'); const n=(el?el.value:store.get('gl-name','')).trim(); if(n) store.set('gl-name',n); return n; }
+function newCode(){ const A='ABCDEFGHJKLMNPQRSTUVWXYZ'; let c=''; for(let i=0;i<4;i++) c+=A[Math.floor(Math.random()*A.length)]; return c; }
+const accessMsg = 'You can view this page but not play online. Ask the owner for “can interact” access.';
+
+async function createRoom(){
+  const name = myName(); if(!name){ online.error='Enter a household name first.'; renderLobby(); return; }
+  const code = newCode();
+  try{
+    await caps.db.doc('rooms/'+code).set({code, host:caps.uid, created:Date.now(), phase:'lobby'});
+    await caps.db.doc(`rooms/${code}/moves/${caps.uid}`).set({name, round:0, joined:Date.now()});
+    enterRoom(code);
+  }catch(e){ online.error = e.code==='invalid_argument' ? accessMsg : 'Could not open a room ('+(e.code||'error')+'). Try again.'; renderLobby(); }
+}
+async function joinRoom(code){
+  code = String(code||'').toUpperCase().trim();
+  const name = myName(); if(!name){ online.error='Enter a household name first.'; renderLobby(); return; }
+  try{
+    const snap = await caps.db.doc('rooms/'+code).get();
+    if(!snap.exists){ online.error='No room with code '+code+'.'; renderLobby(); return; }
+    const mref = caps.db.doc(`rooms/${code}/moves/${caps.uid}`);
+    const mine = await mref.get();
+    if(!mine.exists) await mref.set({name, round:0, joined:Date.now()});
+    enterRoom(code);
+  }catch(e){ online.error = e.code==='invalid_argument' ? accessMsg : 'Could not join ('+(e.code||'error')+').'; renderLobby(); }
+}
+function leaveRoom(){ online.unsubs.forEach(u=>u()); online.unsubs=[]; online.code=null; online.room=null; online.moves={}; }
+function enterRoom(code){
+  leaveRoom(); online.code = code; online.error=''; view='room';
+  if(online.roomsUnsub){ online.roomsUnsub(); online.roomsUnsub=null; }
+  online.unsubs.push(caps.db.doc('rooms/'+code).onSnapshot(s=>{ online.room = s.exists ? s.data() : null; maybeShowReport(); render(); maybeResolve(); }, ()=>{}));
+  online.unsubs.push(caps.db.collection(`rooms/${code}/moves`).onSnapshot(s=>{ const m={}; s.docs.forEach(d=>m[d.id]=d.data()); online.moves=m; render(); maybeResolve(); }, ()=>{}));
+  render();
+}
+function renderRoom(){
+  const room = online.room;
+  if(!room){ $app.innerHTML = `${topbar()}<div class="waiting">Opening room ${esc(online.code)}…</div>`; return; }
+  if(room.phase==='lobby'){
+    const ids = Object.keys(online.moves).sort((a,b)=>(online.moves[a].joined||0)-(online.moves[b].joined||0));
+    const isHost = room.host===caps.uid;
+    $app.innerHTML = `${topbar(`<span class="chip">Room <b class="num">${esc(room.code)}</b></span>`)}
+    <div class="panel" style="max-width:680px;margin:0 auto">
+      <div class="eyebrow">Gathering the parish</div><h2 style="font-size:34px">Room <span class="num" style="color:var(--wheat)">${esc(room.code)}</span></h2>
+      <p style="color:var(--text-dim)">Tell classmates to open this page, go to the <b>Online parish</b> lobby, and join <b class="num">${esc(room.code)}</b>. Up to 6 households.</p>
+      <div class="houses" style="margin-block:14px">${ids.map(id=>`<div class="house${id===caps.uid?' me':''}"><div class="top"><span class="nm">${esc(online.moves[id].name)}${id===room.host?' <span style="font-family:var(--ui);font-size:11px;color:var(--wheat)">host</span>':''}</span><span class="st ready">ready</span></div></div>`).join('')}</div>
+      ${isHost ? `${seasonStepper()}<button class="btn" data-do="start-online" ${ids.length<1?'disabled':''}>Begin in 1798 with ${Math.min(ids.length,6)} household${ids.length===1?'':'s'}</button>` : '<p class="notice">Waiting for the host to choose the number of seasons and begin…</p>'}
+      <p style="margin-top:12px"><button class="link" data-go="lobby">Back to lobby</button></p>
+    </div>`;
+    return;
+  }
+  const st = room.game;
+  const ready = new Set(st.order.filter(id=>online.moves[id] && online.moves[id].round===st.round));
+  const inGame = st.order.includes(caps.uid);
+  const locked = inGame && ready.has(caps.uid);
+  if(online.screenRound !== st.round){ online.screenRound = st.round; online.screen = 'board'; }
+  if(inGame && !locked && !st.over && online.screen==='turn') return turnScreen(st, caps.uid, `<span class="chip">Room <b class="num">${esc(online.code)}</b></span>`);
+  renderGame(st, {mode:'online', me:caps.uid, locked, ready, spectator:!inGame, isHost: room.host===caps.uid});
+}
+async function startOnline(){
+  const ids = Object.keys(online.moves).sort((a,b)=>(online.moves[a].joined||0)-(online.moves[b].joined||0)).slice(0,6);
+  const game = newGame(ids.map(id=>({id, name:online.moves[id].name||'Household'})), online.code+'-'+Date.now(), seasonsPick);
+  await caps.db.doc('rooms/'+online.code).set({...online.room, phase:'play', game});
+}
+async function lockOnline(){
+  const st = online.room.game;
+  await caps.db.doc(`rooms/${online.code}/moves/${caps.uid}`).set({name:st.players[caps.uid].name, round:st.round, family:sel.family, action:sel.action, quiz:sel.quiz, joined:online.moves[caps.uid]?.joined||Date.now()});
+}
+async function maybeResolve(force=false){
+  const room = online.room; if(!room || room.phase!=='play') return;
+  const st = room.game; if(st.over) return;
+  const all = st.order.every(id=>online.moves[id] && online.moves[id].round===st.round);
+  if(!all && !force) return;
+  if(online.resolving===st.round) return;
+  online.resolving = st.round;
+  try{
+    const ref = caps.db.doc('rooms/'+online.code);
+    const lease = await ref.acquire({holder:caps.uid, ttlMs:8000});
+    if(!lease.acquired){ online.resolving = 0; setTimeout(()=>maybeResolve(force), 9000); return; }
+    const fresh = (await ref.get()).data();
+    if(!fresh || fresh.phase!=='play' || fresh.game.round!==st.round) return;
+    const moves = {}; st.order.forEach(id=>{ const m=online.moves[id]; if(m && m.round===st.round) moves[id]=m; });
+    const game = resolveRound(fresh.game, moves);
+    await ref.set({code:fresh.code, host:fresh.host, created:fresh.created, phase: game.over?'over':'play', game});
+  }catch(e){ online.resolving = 0; }
+}
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+document.addEventListener('click', async e=>{
+  const pop = document.getElementById('pop');
+  if(pop && !pop.contains(e.target) && !e.target.closest('[data-hint]')) closePop();
+  const t = e.target.closest('[data-go],[data-do],[data-open],[data-close],[data-fam],[data-act-card],[data-quiz],[data-join],[data-hint],[data-tut],[data-sec],[data-pq],[data-pfilter]');
+  if(!t) return;
+  if(t.dataset.pq!=null){ if(!t.disabled) practicePick(+t.dataset.pq); return; }
+  if(t.dataset.pfilter){ startPractice(t.dataset.pfilter); render(); return; }
+  if(t.dataset.go==='practice' && practice && practice.i>=practice.order.length) practice = null;
+  if(t.dataset.sec){ const h = document.getElementById(t.dataset.sec); if(h){ h.scrollIntoView({behavior: reduced()?'auto':'smooth', block:'start'}); markSec(t.dataset.sec); } return; }
+  if(t.dataset.hint){ const open = document.getElementById('pop'); if(open && open.dataset.for===t.dataset.hint){closePop();return;} openPop(t); document.getElementById('pop').dataset.for=t.dataset.hint; return; }
+  if(t.hasAttribute('data-close')){ if(e.target!==t && t.classList.contains('overlay')) return; overlay=null; renderLayer(); return; }
+  if(t.dataset.open){ overlay=t.dataset.open; renderLayer(); return; }
+  if(t.dataset.tut){ tut={step:0,next:t.dataset.tut}; overlay='tutorial'; renderLayer(); return; }
+  if(t.dataset.go){ keepNames(); if(view==='room') leaveRoom(); view=t.dataset.go; online.error=''; window.scrollTo(0,0); render(); return; }
+  if(t.dataset.fam){ sel.family = t.dataset.fam; render(); return; }
+  if(t.dataset.actCard){ if(t.disabled) return; const k=t.dataset.actCard, i=+t.dataset.idx; if(sel.action===k && sel.actionIdx===i){sel.action=null;sel.actionIdx=null}else{sel.action=k;sel.actionIdx=i} render(); return; }
+  if(t.dataset.quiz){ sel.quiz = +t.dataset.quiz; render(); return; }
+  if(t.dataset.join){ joinRoom(t.dataset.join); return; }
+  const d = t.dataset.do;
+  if(d==='start-local') startLocal();
+  else if(d==='continue'){ if(!(local && !local.state.over)){ const s = store.get('gl-local-save', null); local = s && s.state && s.state.v===4 ? s : null; } if(local){ view='local'; render(); window.scrollTo(0,0); } }
+  else if(d==='resume-local'){ const s = store.get('gl-local-save', null); local = s && s.state && s.state.v===4 ? s : null; if(local){ view='local'; render(); } }
+  else if(d==='reveal-hand'){ local.curtain=false; render(); window.scrollTo(0,0); }
+  else if(d==='begin-season') beginSeason();
+  else if(d==='take-turn'){ online.screen='turn'; render(); window.scrollTo(0,0); }
+  else if(d==='lock'){ if(!sel.family) return; showStamp('Locked in'); if(view==='local') lockLocal(); else { t.disabled=true; try{ await lockOnline(); online.screen='board'; render(); window.scrollTo(0,0); }catch(err){ t.disabled=false; } } }
+  else if(d==='close-report'){
+    overlay=null; render();
+    const st = currentState();
+    if(st && st.over && once('final|'+st.seed)){ confetti(); setTimeout(()=>document.querySelector('.final-rank')?.scrollIntoView({behavior:'smooth',block:'center'}), 200); }
+    else window.scrollTo({top:0,behavior:'smooth'});
+  }
+  else if(d==='create-room') createRoom();
+  else if(d==='join-code') joinRoom(document.getElementById('joincode').value);
+  else if(d==='start-online') startOnline();
+  else if(d==='force-resolve') maybeResolve(true);
+  else if(d==='toggle-hints'){ hintsOn=!hintsOn; store.set('gl-hints',hintsOn); keepNames(); render(); }
+  else if(d==='open-tutorial'){ tut={step:0,next:null}; overlay='tutorial'; renderLayer(); }
+  else if(d==='tut-next'){ tut.step++; renderLayer(); }
+  else if(d==='tut-back'){ tut.step=Math.max(0,tut.step-1); renderLayer(); }
+  else if(d==='tut-skip'){ overlay=null; if(tut.next){ view=tut.next; tut.next=null; window.scrollTo(0,0); render(); } else renderLayer(); }
+  else if(d==='seasons-dec'||d==='seasons-inc'){ keepNames(); seasonsPick=Math.max(MIN_SEASONS,Math.min(MAX_SEASONS,seasonsPick+(d==='seasons-inc'?1:-1))); store.set('gl-seasons',seasonsPick); render(); }
+  else if(d==='close-pop') closePop();
+  else if(d==='pnext') practiceNext();
+  else if(d==='prestart'){ startPractice(practice?.retry?'all':(practice?.filter||'all')); render(); window.scrollTo(0,0); }
+  else if(d==='pretry'){ const P=practice; startPractice(P.filter, P.order.filter(i=>P.picks[i]!==QUIZ[i].a)); render(); window.scrollTo(0,0); }
+});
+document.addEventListener('keydown', e=>{
+  if(view==='practice' && !overlay && !e.ctrlKey && !e.metaKey && !e.altKey && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))){
+    const P = practice;
+    if(P && P.i < P.order.length){
+      const qi = P.order[P.i], k = e.key.toLowerCase(), n = {a:0,b:1,c:2,'1':0,'2':1,'3':2}[k];
+      if(n!=null && P.picks[qi]==null && P.perms[qi][n]!=null){ e.preventDefault(); practicePick(P.perms[qi][n]); return; }
+      if((e.key==='Enter'||e.key==='ArrowRight') && P.picks[qi]!=null){ e.preventDefault(); practiceNext(); return; }
+    }
+  }
+  if(e.key!=='Escape') return;
+  if(document.getElementById('pop')){ closePop(); return; }
+  if(overlay==='guide'){ overlay=null; renderLayer(); }
+});
+window.addEventListener('scroll', closePop, {passive:true});
+document.addEventListener('scroll', closePop, {passive:true, capture:true});
+
+render();
+</script>
